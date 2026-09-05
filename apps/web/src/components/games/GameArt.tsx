@@ -241,6 +241,90 @@ function SpiceArt({ c }: { c: string }) {
   );
 }
 
+
+function TrainArt({ c }: { c: string }) {
+  return (
+    <svg viewBox="0 0 96 96" className="h-full w-full" aria-hidden="true">
+      {/* sky + ground */}
+      <circle cx="72" cy="18" r="7" fill={c} opacity="0.35" />
+      <rect x="6" y="66" width="84" height="5" rx="2.5" fill={c} opacity="0.3" />
+      {/* locomotive */}
+      <rect x="8" y="34" width="22" height="26" rx="4" fill={c} opacity="0.55" />
+      <rect x="11" y="20" width="9" height="14" rx="2" fill={c} opacity="0.8" />
+      <circle cx="14" cy="66" r="5" fill={c} />
+      <circle cx="26" cy="66" r="5" fill={c} />
+      {/* wagon */}
+      <rect x="38" y="30" width="50" height="30" rx="6" fill="none" stroke={c} strokeWidth="4" />
+      <rect x="46" y="38" width="14" height="14" rx="3" fill={c} opacity="0.5" />
+      <rect x="66" y="38" width="14" height="14" rx="3" fill={c} opacity="0.25" />
+      <circle cx="50" cy="66" r="5" fill={c} />
+      <circle cx="76" cy="66" r="5" fill={c} />
+      {/* bell */}
+      <path d="M63 22c0-4 3-7 7-7s7 3 7 7l2 6H61Z" fill={c} />
+      <circle cx="70" cy="31" r="2.5" fill={c} />
+    </svg>
+  );
+}
+
+function GardenArt({ c }: { c: string }) {
+  return (
+    <svg viewBox="0 0 96 96" className="h-full w-full" aria-hidden="true">
+      {/* bridge (top stream) */}
+      <rect x="10" y="20" width="76" height="12" rx="4" fill={c} opacity="0.5" />
+      <rect x="16" y="32" width="6" height="8" fill={c} opacity="0.4" />
+      <rect x="74" y="32" width="6" height="8" fill={c} opacity="0.4" />
+      {/* animal on bridge */}
+      <circle cx="34" cy="26" r="7" fill={c} />
+      {/* falling fruit (bottom stream) */}
+      <circle cx="52" cy="56" r="8" fill={c} opacity="0.85" />
+      <path d="M52 46c2-3 5-3 7-2" stroke={c} strokeWidth="3" strokeLinecap="round" fill="none" />
+      {/* ground */}
+      <rect x="8" y="74" width="80" height="8" rx="4" fill={c} opacity="0.3" />
+      {/* marker flag */}
+      <path d="M78 52v22" stroke={c} strokeWidth="4" strokeLinecap="round" />
+      <path d="M78 52l14 4-14 4Z" fill={c} />
+    </svg>
+  );
+}
+
+function TowerArt({ c }: { c: string }) {
+  return (
+    <svg viewBox="0 0 96 96" className="h-full w-full" aria-hidden="true">
+      {/* three pedestals */}
+      <rect x="10" y="72" width="20" height="6" rx="3" fill={c} opacity="0.45" />
+      <rect x="38" y="72" width="20" height="6" rx="3" fill={c} opacity="0.45" />
+      <rect x="66" y="72" width="20" height="6" rx="3" fill={c} opacity="0.45" />
+      {/* crystals: peg 0 has two, peg 2 has the goal glow */}
+      <rect x="16" y="60" width="18" height="10" rx="3" fill={c} opacity="0.55" />
+      <rect x="19" y="48" width="12" height="9" rx="3" fill={c} opacity="0.8" />
+      {/* moving crystal */}
+      <rect x="44" y="34" width="12" height="9" rx="3" fill={c} />
+      <path d="M50 30v-6" stroke={c} strokeWidth="3" strokeLinecap="round" strokeDasharray="2 3" />
+      {/* goal tower with crystals */}
+      <rect x="70" y="60" width="14" height="10" rx="3" fill={c} opacity="0.7" />
+      <path d="M77 44l3 6-3 6-3-6Z" fill={c} />
+    </svg>
+  );
+}
+
+function BinocularArt({ c }: { c: string }) {
+  return (
+    <svg viewBox="0 0 96 96" className="h-full w-full" aria-hidden="true">
+      {/* ring slots */}
+      <circle cx="48" cy="48" r="30" fill="none" stroke={c} strokeWidth="3" opacity="0.35" />
+      {[[48, 18], [78, 48], [48, 78], [18, 48]].map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="5" fill={c} opacity="0.45" />
+      ))}
+      {/* central lens */}
+      <circle cx="48" cy="48" r="14" fill="none" stroke={c} strokeWidth="5" />
+      {/* flashing bird on the ring */}
+      <circle cx="70" cy="26" r="8" fill={c} />
+      <path d="M70 22c1-2 3-2 4-1" stroke={c} strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path d="M62 26l-6-2 6-2Z" fill={c} opacity="0.6" />
+    </svg>
+  );
+}
+
 export function GameArt({ gameKey, className = "" }: { gameKey: string; className?: string }) {
   const meta = gameMeta(gameKey);
   return (
@@ -256,6 +340,10 @@ export function GameArt({ gameKey, className = "" }: { gameKey: string; classNam
       {gameKey === "lighthouse_keeper" && <LighthouseArt c={meta.color} />}
       {gameKey === "sushi_express" && <SushiArt c={meta.color} />}
       {gameKey === "crystal_palace" && <CrystalArt c={meta.color} />}
+      {gameKey === "train_n_back" && <TrainArt c={meta.color} />}
+      {gameKey === "dual_garden" && <GardenArt c={meta.color} />}
+      {gameKey === "crystal_tower" && <TowerArt c={meta.color} />}
+      {gameKey === "wide_view" && <BinocularArt c={meta.color} />}
     </div>
   );
 }
