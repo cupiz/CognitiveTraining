@@ -24,6 +24,32 @@ export type EmailProvider = "console" | "smtp" | "resend";
 
 const EMAIL_PROVIDER = (process.env.EMAIL_PROVIDER ?? "console") as EmailProvider;
 
+/**
+ * Resolve the base URL used in auth email links.
+ *
+ * Built strictly from the configured origin: protocol must be http(s) and any
+ * path/query/hash from configuration is discarded, so request- or config-fed
+ * values can never steer where auth links (or the mail pipeline) point.
+ */
+export function getAuthBaseUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const url = new URL(raw);
+  if (url.protocol !== "https:" && url.protocol !== "http:") {
+    throw new Error("Auth base URL must be an http(s) origin");
+  }
+  return url.origin;
+}
+
+/** Minimal HTML escaping for values interpolated into email templates. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // ── Main Function ────────────────────────────────────────
 
 /**
@@ -113,7 +139,8 @@ async function sendResendEmail(options: EmailOptions): Promise<boolean> {
  * Generate verification email HTML.
  */
 export function getVerificationEmailHtml(token: string, baseUrl: string): string {
-  const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${token}`;
+  const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
+  const safeUrl = escapeHtml(verifyUrl);
 
   return `
     <!DOCTYPE html>
@@ -129,7 +156,7 @@ export function getVerificationEmailHtml(token: string, baseUrl: string): string
         <p>Thank you for signing up for the Cognitive Training Platform!</p>
         <p>Please click the button below to verify your email address:</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${verifyUrl}" 
+          <a href="${safeUrl}" 
              style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
             Verify Email
           </a>
@@ -137,7 +164,7 @@ export function getVerificationEmailHtml(token: string, baseUrl: string): string
         <p style="color: #666; font-size: 14px;">
           If the button doesn't work, copy and paste this link into your browser:
           <br>
-          <a href="${verifyUrl}">${verifyUrl}</a>
+          <a href="${safeUrl}">${verifyUrl}</a>
         </p>
         <p style="color: #666; font-size: 14px;">
           This link will expire in 24 hours.
@@ -156,7 +183,8 @@ export function getVerificationEmailHtml(token: string, baseUrl: string): string
  * Generate password reset email HTML.
  */
 export function getPasswordResetEmailHtml(token: string, baseUrl: string): string {
-  const resetUrl = `${baseUrl}/api/auth/password-reset/confirm?token=${token}`;
+  const resetUrl = `${baseUrl}/api/auth/password-reset/confirm?token=${encodeURIComponent(token)}`;
+  const safeUrl = escapeHtml(resetUrl);
 
   return `
     <!DOCTYPE html>
@@ -172,7 +200,7 @@ export function getPasswordResetEmailHtml(token: string, baseUrl: string): strin
         <p>We received a request to reset your password.</p>
         <p>Please click the button below to create a new password:</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetUrl}" 
+          <a href="${safeUrl}" 
              style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
             Reset Password
           </a>
@@ -180,7 +208,7 @@ export function getPasswordResetEmailHtml(token: string, baseUrl: string): strin
         <p style="color: #666; font-size: 14px;">
           If the button doesn't work, copy and paste this link into your browser:
           <br>
-          <a href="${resetUrl}">${resetUrl}</a>
+          <a href="${safeUrl}">${resetUrl}</a>
         </p>
         <p style="color: #666; font-size: 14px;">
           This link will expire in 1 hour.

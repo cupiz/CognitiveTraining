@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { PasswordResetRequest } from "@cog/schemas";
 import { prisma } from "@cog/db";
 import { createPasswordResetToken } from "@/lib/auth";
-import { sendEmail, getPasswordResetEmailHtml } from "@/lib/auth/email";
+import { sendEmail, getPasswordResetEmailHtml, getAuthBaseUrl } from "@/lib/auth/email";
 import { dataResponse, errorResponse } from "@/lib/api/response";
 
 export async function POST(request: NextRequest) {
@@ -23,14 +23,14 @@ export async function POST(request: NextRequest) {
 
     if (account) {
       const token = await createPasswordResetToken(account.id);
-      const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+      const baseUrl = getAuthBaseUrl();
 
       // Send password reset email
       await sendEmail({
         to: email,
         subject: "Reset Your Password - Cognitive Training Platform",
         html: getPasswordResetEmailHtml(token, baseUrl),
-        text: `Reset your password: ${baseUrl}/api/auth/password-reset/confirm?token=${token}`,
+        text: `Reset your password: ${baseUrl}/api/auth/password-reset/confirm?token=${encodeURIComponent(token)}`,
       });
     }
 
