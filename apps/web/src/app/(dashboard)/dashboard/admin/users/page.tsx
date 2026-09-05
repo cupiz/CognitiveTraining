@@ -46,6 +46,14 @@ export default function AdminUsersPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  // "Tambah pengguna" form
+  const [showCreate, setShowCreate] = useState(false);
+  const [createEmail, setCreateEmail] = useState("");
+  const [createPassword, setCreatePassword] = useState("");
+  const [createRole, setCreateRole] = useState<AdminUser["role"]>("admin");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createSuccess, setCreateSuccess] = useState<string | null>(null);
 
   const load = useCallback(
     async (opts: { nextOffset?: number } = {}) => {
@@ -120,18 +128,138 @@ export default function AdminUsersPage() {
     }
   }
 
+  async function createUser(e: React.FormEvent) {
+    e.preventDefault();
+    setCreating(true);
+    setCreateError(null);
+    setCreateSuccess(null);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: createEmail.trim(),
+          password: createPassword,
+          role: createRole,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error?.message ?? "Gagal membuat akun");
+      setCreateSuccess(`Akun ${json.data.email} dibuat sebagai ${ROLE_LABEL[json.data.role as AdminUser["role"]]}.`);
+      setCreateEmail("");
+      setCreatePassword("");
+      setCreateRole("admin");
+      setRoleFilter("");
+      void load({ nextOffset: 0 });
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : "Gagal membuat akun");
+    } finally {
+      setCreating(false);
+    }
+  }
+
   const hasPrev = offset > 0;
   const hasNext = offset + PAGE_SIZE < total;
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="page-title">Manajemen Pengguna</h1>
-        <p className="page-subtitle">
-          Semua akun terdaftar. Ubah role atau hapus akun beserta seluruh datanya (anak, sesi,
-          telemetry ikut terhapus permanen).
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="page-title">Manajemen Pengguna</h1>
+          <p className="page-subtitle">
+            Semua akun terdaftar. Ubah role atau hapus akun beserta seluruh datanya (anak, sesi,
+            telemetry ikut terhapus permanen).
+          </p>
+        </div>
+        <button
+          type="button"
+          className="btn-primary flex items-center gap-2"
+          onClick={() => {
+            setShowCreate((v) => !v);
+            setCreateError(null);
+            setCreateSuccess(null);
+          }}
+          aria-expanded={showCreate}
+        >
+          <Icon name="plus" className="size-4" />
+          Tambah pengguna
+        </button>
       </div>
+
+      {/* Create account form */}
+      {showCreate && (
+        <form
+          onSubmit={createUser}
+          className="card space-y-4 px-5 py-5"
+          aria-label="Buat akun baru"
+        >
+          <div>
+            <h2 className="font-bold text-ink">Buat akun baru</h2>
+            <p className="mt-0.5 text-[13px] text-ink-soft">
+              Akun langsung aktif dengan role pilihan — pemiliknya bisa langsung masuk dengan
+              email dan sandi ini.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <label className="block">
+              <span className="field-label">Email</span>
+              <input
+                type="email"
+                required
+                value={createEmail}
+                onChange={(e) => setCreateEmail(e.target.value)}
+                className="input"
+                placeholder="nama@contoh.com"
+                autoComplete="off"
+              />
+            </label>
+            <label className="block">
+              <span className="field-label">Sandi (min. 8 karakter)</span>
+              <input
+                type="text"
+                required
+                minLength={8}
+                value={createPassword}
+                onChange={(e) => setCreatePassword(e.target.value)}
+                className="input"
+                placeholder="Sandi sementara"
+                autoComplete="new-password"
+              />
+            </label>
+            <label className="block">
+              <span className="field-label">Role</span>
+              <select
+                value={createRole}
+                onChange={(e) => setCreateRole(e.target.value as AdminUser["role"])}
+                className="input"
+                aria-label="Role akun baru"
+              >
+                <option value="admin">Admin</option>
+                <option value="parent">Orang Tua</option>
+                <option value="researcher">Peneliti</option>
+              </select>
+            </label>
+          </div>
+          {createError && <div className="alert-danger">{createError}</div>}
+          {createSuccess && <div className="alert-success">{createSuccess}</div>}
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => {
+                setShowCreate(false);
+                setCreateError(null);
+                setCreateSuccess(null);
+              }}
+            >
+              Batal
+            </button>
+            <button type="submit" disabled={creating} className="btn-primary">
+              {creating ? "Membuat…" : "Buat akun"}
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2.5">

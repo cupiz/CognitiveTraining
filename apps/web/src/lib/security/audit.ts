@@ -37,6 +37,7 @@ export type AuditAction =
   | "data.export"
   | "data.delete"
   | "admin.game_visibility"
+  | "admin.user_create"
   | "admin.user_role_change"
   | "admin.user_delete"
   | "admin.child_status"
