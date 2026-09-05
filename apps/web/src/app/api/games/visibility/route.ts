@@ -14,7 +14,10 @@ export async function GET() {
 
     const visibility: Record<string, boolean> = {};
     for (const g of GAMES) {
-      visibility[g.key] = visibleByKey.get(g.key) ?? false;
+      // Unconfigured = visible (fail-open). A fresh database would otherwise
+      // hide the entire game collection on the public landing page; admins
+      // hide games explicitly from the admin panel.
+      visibility[g.key] = visibleByKey.get(g.key) ?? true;
     }
 
     return dataResponse(visibility);

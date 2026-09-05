@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
+import { E2E_BASE_URL } from "./test-db";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = E2E_BASE_URL;
 
 /** Unique email for test isolation */
 export function testEmail(suffix = "e2e"): string {
@@ -69,7 +70,7 @@ export async function createChild(
   page: Page,
   displayName = "Nadia",
 ): Promise<string> {
-  const res = await page.request.post("http://localhost:3000/api/children", {
+  const res = await page.request.post(`${BASE_URL}/api/children`, {
     data: {
       displayName,
       birthYear: 2018,
