@@ -10,18 +10,30 @@ interface WideViewProps {
 }
 
 /**
- * Star-pad positions INSIDE the circular lens view: 8 compass points on a
- * ring at 34% radius from the centre — comfortably clear of the bezel.
+ * Star-pad positions INSIDE the circular lens: 8 compass points on a ring
+ * at 30% radius from the centre — far from the lens edge, nothing overlaps.
  */
 const SLOTS: { x: number; y: number }[] = [
-  { x: 50, y: 18 }, // top
-  { x: 81, y: 19 }, // top-right
-  { x: 82, y: 50 }, // right
-  { x: 81, y: 81 }, // bottom-right
-  { x: 50, y: 82 }, // bottom
-  { x: 19, y: 81 }, // bottom-left
-  { x: 18, y: 50 }, // left
-  { x: 19, y: 19 }, // top-left
+  { x: 50, y: 20 }, // top
+  { x: 71, y: 29 }, // top-right
+  { x: 80, y: 50 }, // right
+  { x: 71, y: 71 }, // bottom-right
+  { x: 50, y: 80 }, // bottom
+  { x: 29, y: 71 }, // bottom-left
+  { x: 20, y: 50 }, // left
+  { x: 29, y: 29 }, // top-left
+];
+
+/** Compass names for the miss feedback — kids learn where they missed. */
+const SLOT_NAMES = [
+  "atas",
+  "kanan-atas",
+  "kanan",
+  "kanan-bawah",
+  "bawah",
+  "kiri-bawah",
+  "kiri",
+  "kiri-atas",
 ];
 
 export function WideView({ renderState, onCellTap }: WideViewProps) {
@@ -57,50 +69,65 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
     <div className="flex w-full flex-col items-center gap-3" style={{ maxWidth: "min(36rem, 100%)" }}>
       <TrialHeader isPractice={isPractice} trial={trialNumber} total={totalTrials} score={score} accent={accent} />
 
-      {/* Central task banner */}
+      {/* ── Central mini-task: its own banner, can never cover the sky ── */}
       <div
-        className="w-full rounded-2xl px-4 py-2 text-center"
-        style={{ backgroundColor: "var(--game-surface-2)", border: "2px solid var(--game-line)" }}
-        aria-label="Aturan tengah"
+        className="flex w-full items-center justify-center gap-4 rounded-2xl border-2 px-4 py-3"
+        style={{ backgroundColor: "var(--game-surface-2)", borderColor: accent }}
+        aria-label="Tugas tengah"
       >
-        <p className="text-[13px] font-extrabold" style={{ color: "var(--game-ink)" }}>
-          👁️ Awasi simbol tengah — dan ingat posisi burung 🐦 yang berkedip!
-        </p>
+        <div
+          className="flex size-16 shrink-0 items-center justify-center rounded-2xl border-4 text-3xl font-black shadow-inner"
+          style={{ borderColor: accent, color: centralIsTarget ? accent : "var(--game-ink)" }}
+          aria-label={`Simbol tengah ${centralSymbol ?? ""}`}
+        >
+          {centralSymbol ?? "👁️"}
+        </div>
+        <div>
+          <p className="text-[13px] font-extrabold" style={{ color: "var(--game-ink)" }}>
+            {centralIsTarget ? "⭐ Simbol ini = SEGERA KETUK layar!" : "Simbol biasa — jangan diketuk"}
+          </p>
+          <p className="text-[12px] font-semibold" style={{ color: "var(--game-ink-mute)" }}>
+            Sambil mengintip burung 🐦 yang berkedip di teleskop bawah
+          </p>
+        </div>
       </div>
 
-      {/* ── Telescope device ─────────────────────────────── */}
+      {/* ── Telescope: circular lens with ONLY the star-pads inside ── */}
       <div
-        className="relative w-full touch-none select-none rounded-[3rem] border-4 p-4 shadow-pop"
+        className="relative w-full touch-none select-none rounded-[3rem] border-4 p-5 shadow-pop"
         style={{
           borderColor: "#3a2f1d",
           background: "linear-gradient(180deg, #4a3b22 0%, #2e2517 60%, #1f180d 100%)",
         }}
       >
-        {/* brass rivets on the bezel */}
         <span className="pointer-events-none absolute left-4 top-1/2 size-2 -translate-y-1/2 rounded-full bg-[#c9a44d]" />
         <span className="pointer-events-none absolute right-4 top-1/2 size-2 -translate-y-1/2 rounded-full bg-[#c9a44d]" />
 
-        {/* ── Circular lens view ─────────────────────────── */}
         <div
-          className="relative mx-auto aspect-square w-full max-w-[30rem] overflow-hidden rounded-full"
+          className="relative mx-auto aspect-square w-full max-w-[28rem] overflow-hidden rounded-full"
           style={{
             background: "radial-gradient(circle at 50% 45%, #2a3c78 0%, #17224d 55%, #0a0f26 100%)",
             boxShadow:
               "inset 0 0 0 8px rgb(201 164 77 / 0.35), inset 0 0 60px 20px rgb(6 9 24 / 0.8), 0 0 0 4px rgb(0 0 0 / 0.4)",
           }}
         >
-          {/* twinkling stars inside the lens */}
+          <style>{`
+            @keyframes wv-twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+            @keyframes wv-pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.06); opacity: 0.9; } }
+          `}</style>
+
+          {/* twinkling stars */}
           {[
-            [30, 30],
-            [58, 22],
-            [70, 40],
-            [26, 52],
-            [64, 62],
-            [38, 68],
-            [52, 36],
-            [22, 38],
-            [74, 58],
-            [44, 74],
+            [30, 26],
+            [58, 20],
+            [72, 38],
+            [24, 44],
+            [68, 60],
+            [36, 66],
+            [50, 36],
+            [20, 34],
+            [76, 56],
+            [44, 76],
           ].map(([x, y], i) => (
             <span
               key={i}
@@ -108,19 +135,13 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
               style={{
                 left: `${x}%`,
                 top: `${y}%`,
-                opacity: 0.4 + (i % 3) * 0.2,
-                animation: `twinkle-${i % 3} ${1.8 + (i % 4) * 0.5}s ease-in-out infinite`,
+                animation: `wv-twinkle ${1.8 + (i % 4) * 0.5}s ease-in-out infinite`,
+                animationDelay: `${(i % 5) * 0.3}s`,
               }}
             />
           ))}
-          <style>{`
-            @keyframes twinkle-0 { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.95; } }
-            @keyframes twinkle-1 { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.25; } }
-            @keyframes twinkle-2 { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-            @keyframes wv-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.12); } }
-          `}</style>
 
-          {/* soft nebula tint */}
+          {/* nebula tint */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
@@ -129,31 +150,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
             }}
           />
 
-          {/* ── Central telescope lens (the mini-task) ── */}
-          <div
-            className="absolute left-1/2 top-1/2 z-10 flex size-28 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 shadow-xl sm:size-32"
-            style={{
-              backgroundColor: "var(--game-surface-2)",
-              borderColor: accent,
-              boxShadow: `0 0 30px 8px ${accent}55, inset 0 0 18px rgb(0 0 0 / 0.35)`,
-            }}
-          >
-            {centralSymbol ? (
-              <span
-                className={`text-5xl leading-none ${centralIsTarget ? "" : "opacity-75"}`}
-                style={{ color: centralIsTarget ? accent : "var(--game-ink)" }}
-                aria-label={`Simbol tengah ${centralSymbol}`}
-              >
-                {centralSymbol}
-              </span>
-            ) : (
-              <span className="text-4xl opacity-30" aria-hidden="true">
-                🔭
-              </span>
-            )}
-          </div>
-
-          {/* ── Star-pads on the ring ── */}
+          {/* ── The 8 star-pads (the ONLY interactive things here) ── */}
           {SLOTS.map((slot, i) => {
             const flashing = flashActive && flashPosition === i;
             const isCorrect = correctSlot === i;
@@ -165,7 +162,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
                 onClick={() => onCellTap(i)}
                 disabled={!probeInteractive}
                 aria-label={`Posisi ${i + 1}`}
-                className={`absolute z-10 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-2xl shadow-lg transition-all sm:size-16 ${
+                className={`absolute z-10 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-2xl transition-all sm:size-20 sm:text-3xl ${
                   probeInteractive ? "cursor-pointer" : ""
                 }`}
                 style={{
@@ -180,12 +177,12 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
                         : "rgb(255 255 255 / 0.14)",
                   border: `3px solid ${flashing ? "#fff" : isCorrect ? "#2f9e63" : isProbed ? accent : "rgb(255 255 255 / 0.45)"}`,
                   boxShadow: flashing
-                    ? "0 0 34px 12px rgb(255 210 90 / 0.85)"
+                    ? "0 0 40px 16px rgb(255 210 90 / 0.85)"
                     : isCorrect
-                      ? "0 0 18px 6px rgb(47 158 99 / 0.55)"
-                      : "0 4px 10px rgb(0 0 0 / 0.5)",
+                      ? "0 0 20px 8px rgb(47 158 99 / 0.55)"
+                      : "0 4px 12px rgb(0 0 0 / 0.55)",
                   transform: flashing
-                    ? "translate(-50%, -50%) scale(1.35)"
+                    ? "translate(-50%, -50%) scale(1.3)"
                     : isProbed
                       ? "translate(-50%, -50%) scale(1.08)"
                       : "translate(-50%, -50%)",
@@ -194,7 +191,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
                 {flashing && <span aria-hidden="true">🐦</span>}
                 {isCorrect && !flashing && <span aria-hidden="true" className="text-white">✓</span>}
                 {!flashing && !isCorrect && !isProbed && (
-                  <span aria-hidden="true" className="text-base opacity-60">
+                  <span aria-hidden="true" className="text-xl opacity-70">
                     ✦
                   </span>
                 )}
@@ -205,28 +202,31 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
           {/* gentle pulse hint during probe */}
           {probeInteractive && (
             <div
-              className="pointer-events-none absolute left-1/2 top-1/2 size-[68%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed"
+              className="pointer-events-none absolute left-1/2 top-1/2 size-[74%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed"
               style={{
-                borderColor: "rgb(255 255 255 / 0.25)",
-                animation: "wv-pulse 2.2s ease-in-out infinite",
+                borderColor: "rgb(255 255 255 / 0.22)",
+                animation: "wv-pulse 2.4s ease-in-out infinite",
               }}
               aria-hidden="true"
             />
           )}
-
-          {/* Feedback bubble inside the lens */}
-          {showFeedback && (
-            <div
-              className={`pop-in absolute left-1/2 top-[14%] z-20 -translate-x-1/2 rounded-full border-2 px-5 py-2 text-[15px] font-black shadow-xl ${
-                feedbackKind === "correct" ? "border-[#b8e3cd] bg-[#eaf9f1]" : "border-[#f3c1bd] bg-[#fdeceb]"
-              }`}
-              role="status"
-              style={{ color: feedbackKind === "correct" ? "var(--game-correct)" : "var(--game-wrong)" }}
-            >
-              {feedbackText}
-            </div>
-          )}
         </div>
+      </div>
+
+      {/* ── Feedback row: reserved height, its own line ── */}
+      <div className="flex h-9 w-full items-center justify-center" aria-live="polite">
+        {showFeedback && (
+          <div
+            className={`pop-in rounded-full border-2 px-5 py-1.5 text-[15px] font-black shadow-md ${
+              feedbackKind === "correct" ? "border-[#b8e3cd] bg-[#eaf9f1]" : "border-[#f3c1bd] bg-[#fdeceb]"
+            }`}
+            style={{ color: feedbackKind === "correct" ? "var(--game-correct)" : "var(--game-wrong)" }}
+          >
+            {feedbackKind === "correct"
+              ? feedbackText
+              : `${feedbackText} Burung ada di posisi ${correctSlot + 1} (${SLOT_NAMES[correctSlot] ?? "?"}).`}
+          </div>
+        )}
       </div>
 
       {/* Playing hint */}
@@ -238,7 +238,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
         <p className="text-[12px] font-semibold" style={{ color: "var(--game-ink-mute)" }}>
           {phase === "probe"
             ? "Sekarang tunjuk: di mana burung tadi berkedip?"
-            : "Simbol tengah ⭐ = segera ketuk! Dan mata tetap mengawasi burung di tepi."}
+            : "Simbol tengah ⭐ = segera ketuk! Dan mata tetap mengawasi burung di teleskop."}
         </p>
       </div>
 
