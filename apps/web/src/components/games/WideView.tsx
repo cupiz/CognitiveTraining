@@ -53,53 +53,78 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
     <div className="flex w-full flex-col items-center gap-3" style={{ maxWidth: "min(34rem, 100%)" }}>
       <TrialHeader isPractice={isPractice} trial={trialNumber} total={totalTrials} score={score} accent={accent} />
 
-      {/* Central mini-task banner */}
+      {/* Central task banner */}
       <div
         className="w-full rounded-2xl px-4 py-2 text-center"
         style={{ backgroundColor: "var(--game-surface-2)", border: "2px solid var(--game-line)" }}
         aria-label="Aturan tengah"
       >
         <p className="text-[13px] font-extrabold" style={{ color: "var(--game-ink)" }}>
-          Awasi simbol tengah — dan ingat posisi burung yang berkedip!
+          👁️ Awasi simbol tengah — dan ingat posisi burung 🐦 yang berkedip!
         </p>
       </div>
 
-      {/* Sky scene */}
+      {/* Observatory scene */}
       <div
         className="relative w-full touch-none select-none overflow-hidden rounded-3xl border-2 shadow-pop"
         style={{
           aspectRatio: "4 / 3",
           borderColor: "var(--game-line)",
-          background: "linear-gradient(180deg, #0f1d3d 0%, #23356b 70%, #33477f 100%)",
+          background:
+            "radial-gradient(circle at 50% 50%, #2a3c78 0%, #17224d 55%, #0d1330 100%)",
         }}
       >
-        {/* stars */}
-        <div className="pointer-events-none absolute left-[22%] top-[18%] size-1 rounded-full bg-white/70" />
-        <div className="pointer-events-none absolute right-[30%] top-[12%] size-1 rounded-full bg-white/60" />
-        <div className="pointer-events-none absolute left-[48%] top-[40%] size-1 rounded-full bg-white/50" />
-
-        {/* Centre: the mini-task symbol */}
+        {/* vignette: telescope framing */}
         <div
-          className="absolute left-1/2 top-1/2 flex size-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-3xl border-4 shadow-lg"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at 50% 50%, transparent 42%, rgb(6 9 24 / 0.55) 100%)",
+          }}
+        />
+        {/* stars */}
+        {[
+          [18, 22],
+          [34, 10],
+          [62, 18],
+          [78, 30],
+          [24, 62],
+          [72, 68],
+          [40, 84],
+          [60, 78],
+        ].map(([x, y], i) => (
+          <span
+            key={i}
+            className="pointer-events-none absolute size-1 rounded-full bg-white/70"
+            style={{ left: `${x}%`, top: `${y}%` }}
+          />
+        ))}
+
+        {/* Centre: telescope lens card */}
+        <div
+          className="absolute left-1/2 top-1/2 z-10 flex size-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 shadow-lg"
           style={{
             backgroundColor: "var(--game-surface-2)",
             borderColor: accent,
+            boxShadow: `0 0 24px 6px ${accent}55`,
           }}
         >
           {centralSymbol ? (
             <span
-              className={`text-4xl leading-none ${centralIsTarget ? "" : "opacity-80"}`}
+              className={`text-4xl leading-none ${centralIsTarget ? "" : "opacity-75"}`}
               style={{ color: centralIsTarget ? accent : "var(--game-ink)" }}
               aria-label={`Simbol tengah ${centralSymbol}`}
             >
               {centralSymbol}
             </span>
           ) : (
-            <span className="text-3xl opacity-30">👁️</span>
+            <span className="text-3xl opacity-30" aria-hidden="true">
+              🔭
+            </span>
           )}
         </div>
 
-        {/* Peripheral slots */}
+        {/* Peripheral slots on the ring */}
         {SLOTS.map((slot, i) => {
           const flashing = flashActive && flashPosition === i;
           const isCorrect = correctSlot === i;
@@ -125,8 +150,12 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
                       ? "rgb(255 255 255 / 0.35)"
                       : "rgb(255 255 255 / 0.12)",
                 border: `3px solid ${flashing ? "#fff" : isCorrect ? "#2f9e63" : isProbed ? accent : "rgb(255 255 255 / 0.4)"}`,
-                boxShadow: flashing ? "0 0 24px 8px rgb(255 210 90 / 0.75)" : undefined,
-                transform: `translate(-50%, -50%) scale(${flashing ? 1.5 : 1})`,
+                boxShadow: flashing
+                  ? "0 0 28px 10px rgb(255 210 90 / 0.8)"
+                  : isCorrect
+                    ? "0 0 16px 4px rgb(47 158 99 / 0.5)"
+                    : undefined,
+                transform: `translate(-50%, -50%) scale(${flashing ? 1.6 : 1})`,
               }}
             >
               {flashing && <span aria-hidden="true">🐦</span>}
@@ -139,7 +168,9 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
         {phase === "feedback" && feedbackKind && (
           <div
             className={`pop-in absolute left-1/2 top-2 z-20 -translate-x-1/2 rounded-full border-2 px-4 py-1.5 text-[14px] font-black shadow-lg ${
-              feedbackKind === "correct" ? "border-[#b8e3cd] bg-[#eaf9f1]" : "border-[#f3c1bd] bg-[#fdeceb]"
+              feedbackKind === "correct"
+                ? "border-[#b8e3cd] bg-[#eaf9f1]"
+                : "border-[#f3c1bd] bg-[#fdeceb]"
             }`}
             role="status"
             style={{ color: feedbackKind === "correct" ? "var(--game-correct)" : "var(--game-wrong)" }}
@@ -147,6 +178,17 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
             {feedbackText}
           </div>
         )}
+      </div>
+
+      {/* Playing hint */}
+      <div
+        className="flex w-full items-center gap-2 rounded-xl px-3 py-1.5"
+        style={{ backgroundColor: `${accent}12` }}
+      >
+        <span aria-hidden="true">💡</span>
+        <p className="text-[12px] font-semibold" style={{ color: "var(--game-ink-mute)" }}>
+          Simbol tengah ⭐ = segera ketuk! Dan mata tetap mengawasi burung di tepi.
+        </p>
       </div>
 
       <ProgressBar value={isPractice ? 0 : trialNumber / Math.max(1, totalTrials)} accent={accent} />

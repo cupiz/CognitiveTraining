@@ -393,7 +393,137 @@ function CrystalScene({ accent }: { accent: string }) {
   );
 }
 
+
+function TrainNBackScene({ accent }: { accent: string }) {
+  return (
+    <div className="relative flex h-[88px] w-48 items-center justify-center">
+      <div
+        className="relative h-[76px] w-[150px] overflow-hidden rounded-xl border-2"
+        style={{
+          borderColor: hexToRgba(accent, 0.5),
+          background: "linear-gradient(180deg, #b8e2f5 55%, #a5d68f 55%, #7fbf6a 100%)",
+        }}
+      >
+        {/* wagon window with a moving fruit */}
+        <div className="absolute inset-x-4 top-2 flex h-10 items-center justify-center rounded-lg border-2 border-[#3f7ec7] bg-[#fdf3d7]">
+          <span className="text-xl" style={{ animation: "cm-bob 1.6s ease-in-out infinite" }}>
+            🍎
+          </span>
+        </div>
+        {/* bell */}
+        <div
+          className="absolute bottom-1 left-1/2 flex size-8 -translate-x-1/2 items-center justify-center rounded-full border-2 border-[#d99418] bg-[#ffe27a] text-base"
+          style={{ animation: "cm-bob 1.2s ease-in-out infinite" }}
+        >
+          🔔
+        </div>
+        <span className="absolute right-2 top-1 text-sm opacity-60">🚂</span>
+      </div>
+    </div>
+  );
+}
+
+function DualGardenScene({ accent }: { accent: string }) {
+  return (
+    <div className="relative flex h-[88px] w-48 items-center justify-center">
+      <div
+        className="relative h-[76px] w-[150px] overflow-hidden rounded-xl border-2"
+        style={{
+          borderColor: hexToRgba(accent, 0.5),
+          background: "linear-gradient(180deg, #cdeccd 40%, #8fd07a 40%, #7fbf6a 100%)",
+        }}
+      >
+        {/* bridge stream */}
+        <div className="absolute inset-x-3 top-1.5 flex h-8 items-center justify-center rounded-lg border-2 border-[#8a6d3b] bg-[#f2e3bd]">
+          <span className="text-lg" style={{ animation: "cm-bob 1.8s ease-in-out infinite" }}>
+            🐰
+          </span>
+        </div>
+        {/* fruit stream */}
+        <div className="absolute inset-x-3 bottom-1 flex h-6 items-center justify-center rounded-lg border-2 border-[#4e8f3f] bg-[#dff3d0]">
+          <span className="text-base">🍎</span>
+        </div>
+        <span className="absolute bottom-1.5 right-2 rounded bg-[#ffe9b8] px-1 text-[9px] font-black">
+          Tandai!
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function CrystalTowerScene({ accent }: { accent: string }) {
+  return (
+    <div className="relative flex h-[88px] w-48 items-center justify-center">
+      <div
+        className="relative flex h-[76px] w-[150px] items-end justify-center gap-2 overflow-hidden rounded-xl border-2 px-2 pb-1.5"
+        style={{
+          borderColor: hexToRgba(accent, 0.5),
+          background: "linear-gradient(180deg, #1b2450, #2a3568)",
+        }}
+      >
+        {[1, 0, 0].map((count, i) => (
+          <div
+            key={i}
+            className="relative flex h-[56px] w-[36px] flex-col-reverse items-center gap-0.5 rounded-lg border-2"
+            style={{
+              borderColor: i === 2 ? "#f2c94c" : "rgb(255 255 255 / 0.3)",
+              backgroundColor: i === 0 ? "rgb(255 255 255 / 0.08)" : "transparent",
+            }}
+          >
+            {Array.from({ length: count }, (_, d) => (
+              <span
+                key={d}
+                className="w-[26px] rounded-sm border border-[#6f42c0]"
+                style={{
+                  height: "8px",
+                  background: "linear-gradient(180deg, #cdb3ff, #8f5fe0)",
+                }}
+              />
+            ))}
+          </div>
+        ))}
+        <span
+          className="absolute right-4 top-1 text-sm"
+          style={{ animation: "cm-bob 1.4s ease-in-out infinite" }}
+        >
+          🎯
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function WideViewScene({ accent }: { accent: string }) {
+  return (
+    <div className="relative flex h-[88px] w-48 items-center justify-center">
+      <div
+        className="relative flex h-[76px] w-[150px] items-center justify-center overflow-hidden rounded-xl border-2"
+        style={{
+          borderColor: hexToRgba(accent, 0.5),
+          background: "radial-gradient(circle at 50% 50%, #2a3c78, #0d1330)",
+        }}
+      >
+        {/* central lens */}
+        <div className="flex size-9 items-center justify-center rounded-full border-2 border-[#2f7fc9] bg-white/90">
+          <span className="text-base">▲</span>
+        </div>
+        {/* flashing bird on the ring */}
+        <span
+          className="absolute left-[14%] top-[18%] flex size-7 items-center justify-center rounded-full border-2 border-white bg-[#f2a532] text-xs"
+          style={{
+            animation: "sx-blink 1.6s ease-in-out infinite",
+          }}
+        >
+          🐦
+        </span>
+        <span className="absolute bottom-[12%] right-[12%] text-xs opacity-60">🐦?</span>
+      </div>
+    </div>
+  );
+}
+
 /* ── dispatcher ───────────────────────────────────────── */
+
 
 function scene(gameKey: string, accent: string): React.ReactNode {
   switch (gameKey) {
@@ -419,6 +549,14 @@ function scene(gameKey: string, accent: string): React.ReactNode {
       return <SushiScene accent={accent} />;
     case "crystal_palace":
       return <CrystalScene accent={accent} />;
+    case "train_n_back":
+      return <TrainNBackScene accent={accent} />;
+    case "dual_garden":
+      return <DualGardenScene accent={accent} />;
+    case "crystal_tower":
+      return <CrystalTowerScene accent={accent} />;
+    case "wide_view":
+      return <WideViewScene accent={accent} />;
     default:
       return (
         <div className="flex items-center gap-2 text-2xl">
