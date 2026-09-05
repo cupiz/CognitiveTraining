@@ -39,3 +39,5 @@ query-events.mjs
 
 # pnpm
 pnpm-debug.log
+*.png
+*.mjs.bak
