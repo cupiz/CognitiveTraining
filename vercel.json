@@ -1,0 +1,30 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm --filter @cog/web build",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "pnpm install",
+  "regions": ["sin1"],
+  "functions": {
+    "apps/web/.next/server/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/dashboard/:path*",
+      "destination": "/dashboard/:path*"
+    }
+  ]
+}

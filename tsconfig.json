@@ -1,0 +1,25 @@
+{
+  "files": [],
+  "references": [
+    { "path": "apps/web" },
+    { "path": "packages/schemas" },
+    { "path": "packages/db" },
+    { "path": "packages/ui" },
+    { "path": "packages/game-core" },
+    { "path": "packages/game-memory-matrix" },
+    { "path": "packages/game-target-watch" },
+    { "path": "packages/game-quick-match" },
+    { "path": "packages/game-stop-signal" },
+    { "path": "packages/game-rule-switch" },
+    { "path": "packages/game-spice-stall" },
+    { "path": "packages/game-red-light" },
+    { "path": "packages/game-courier-map" },
+    { "path": "packages/game-lighthouse-keeper" },
+    { "path": "packages/game-sushi-express" },
+    { "path": "packages/game-crystal-palace" },
+    { "path": "packages/scoring" },
+    { "path": "packages/adaptive" },
+    { "path": "packages/planner" },
+    { "path": "packages/analytics" }
+  ]
+}

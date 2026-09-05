@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+/* ────────────────────────────────────────────────────────────
+   Design tokens (Tailwind v4 CSS-first configuration)
+   Warm neutrals + deep-teal brand — calm, trustworthy parent UI
+   that still feels warm and human, not clinical gray.
+   ──────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Warm paper neutrals */
+  --color-canvas: #f5f3ee;        /* app background */
+  --color-canvas-deep: #ece9e1;   /* subtle section backgrounds */
+  --color-surface: #ffffff;
+  --color-surface-2: #faf9f5;     /* hover / inset fills */
+
+  --color-line: #e6e2d8;          /* hairline borders */
+  --color-line-strong: #d5d0c2;   /* input borders, stronger dividers */
+
+  --color-ink: #221f19;           /* primary text */
+  --color-ink-soft: #5d584e;      /* secondary text */
+  --color-ink-mute: #8f897c;      /* tertiary text */
+  --color-ink-faint: #b3ad9f;     /* placeholders / disabled */
+
+  /* Brand — deep teal (health, growth, calm confidence) */
+  --color-brand-50: #ecf5f2;
+  --color-brand-100: #d3e8e1;
+  --color-brand-200: #a9d1c5;
+  --color-brand-500: #14957d;
+  --color-brand-600: #0d7c68;
+  --color-brand-700: #0a6454;
+  --color-brand-800: #0a4f43;
+  --color-brand-900: #0b3d34;
+
+  /* Semantic colors (warm-adjusted, not default palette) */
+  --color-success-50: #e7f4ec;
+  --color-success-600: #1e8a58;
+  --color-success-700: #166e46;
+
+  --color-danger-50: #fbeae7;
+  --color-danger-100: #f5d4ce;
+  --color-danger-600: #c03f2d;
+  --color-danger-700: #9c3022;
+
+  --color-warning-50: #f9f0de;
+  --color-warning-600: #b07a10;
+  --color-warning-700: #8f620c;
+
+  /* Game domain hues — deliberate 5-hue spread, one per game */
+  --color-memory: #3b63c9;        /* working memory  — indigo */
+  --color-attention: #7a52c8;     /* sustained attention — violet */
+  --color-speed: #d9821b;         /* processing speed — saffron */
+  --color-inhibit: #d64545;       /* inhibitory control — vermilion */
+  --color-flex: #0f9d6e;          /* cognitive flexibility — emerald */
+
+  /* Elevation — restrained; borders do most of the work */
+  --shadow-pop: 0 4px 16px -6px rgb(34 31 25 / 0.12), 0 12px 32px -12px rgb(34 31 25 / 0.16);
+  --shadow-modal: 0 24px 64px -16px rgb(34 31 25 / 0.25);
+
+  /* Display typeface for the playful landing surface (Baloo 2 via next/font variable) */
+  --font-display: var(--font-baloo), ui-rounded, "SF Pro Rounded", "Segoe UI",
+    system-ui, sans-serif;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable",
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    background: var(--color-brand-100);
+    color: var(--color-brand-900);
+  }
+
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+@layer components {
+  /* ── Typography helpers ─────────────────────────────── */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-mute;
+  }
+  .page-title {
+    @apply text-[1.75rem] font-bold leading-tight tracking-[-0.02em] text-ink;
+  }
+  .page-subtitle {
+    @apply mt-1.5 text-[15px] text-ink-soft;
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Surfaces ───────────────────────────────────────── */
+  .card {
+    @apply rounded-xl border border-line bg-surface;
+  }
+  .card-flush {
+    @apply rounded-xl border border-line bg-surface-2;
+  }
+  .divider {
+    @apply h-px bg-line;
+  }
+
+  /* ── Buttons ────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-1.5 rounded-lg text-sm font-semibold
+      transition-[background-color,border-color,color,box-shadow,transform] duration-150
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply inline-flex select-none items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold
+      bg-brand-600 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]
+      transition-[background-color,border-color,color,box-shadow,transform] duration-150
+      hover:bg-brand-700 active:scale-[0.98]
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex select-none items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold
+      border border-line-strong bg-surface text-ink
+      transition-[background-color,border-color,color,box-shadow,transform] duration-150
+      hover:border-ink-faint hover:bg-surface-2 active:scale-[0.98]
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex select-none items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold
+      text-ink-soft transition-colors duration-150 hover:bg-ink/[0.06] hover:text-ink
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-danger {
+    @apply inline-flex select-none items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold
+      bg-danger-600 text-white
+      transition-[background-color,border-color,color,box-shadow,transform] duration-150
+      hover:bg-danger-700 active:scale-[0.98]
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-danger-ghost {
+    @apply inline-flex select-none items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold
+      border border-danger-100 bg-white text-danger-600
+      transition-[background-color,border-color,color,box-shadow,transform] duration-150
+      hover:border-danger-100 hover:bg-danger-50
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .icon-btn {
+    @apply inline-flex size-9 items-center justify-center rounded-lg border border-transparent text-ink-soft
+      transition-colors hover:bg-ink/[0.06] hover:text-ink
+      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+      disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  /* ── Forms ──────────────────────────────────────────── */
+  .field-label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink;
+  }
+  .input {
+    @apply block w-full rounded-lg border border-line-strong bg-surface px-3.5 py-2.5 text-[15px] text-ink
+      shadow-[0_1px_2px_rgb(34_31_25/0.04)] transition-shadow placeholder:text-ink-faint
+      hover:border-ink-faint focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/20
+      disabled:opacity-60;
+  }
+  select.input {
+    @apply cursor-pointer appearance-none bg-[linear-gradient(45deg,transparent_50%,var(--color-ink-faint)_50%),linear-gradient(135deg,var(--color-ink-faint)_50%,transparent_50%)]
+      bg-[length:5px_5px,5px_5px] bg-[position:calc(100%-18px)_calc(50%-2px),calc(100%-13px)_calc(50%-2px)] bg-no-repeat pr-9;
+  }
+
+  /* ── Badges & chips ─────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[0.08em];
+  }
+  .badge-success {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[0.08em] bg-success-50 text-success-700;
+  }
+  .badge-danger {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[0.08em] bg-danger-50 text-danger-600;
+  }
+  .badge-warning {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[0.08em] bg-warning-50 text-warning-700;
+  }
+  .badge-brand {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[0.08em] bg-brand-50 text-brand-700;
+  }
+  .badge-neutral {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-[11px] font-semibold uppercase tracking-[0.08em] bg-canvas-deep text-ink-soft;
+  }
+
+  /* ── Inline feedback ────────────────────────────────── */
+  .alert-danger {
+    @apply flex items-start gap-2.5 rounded-lg px-3.5 py-3 text-sm bg-danger-50 text-danger-700;
+  }
+  .alert-success {
+    @apply flex items-start gap-2.5 rounded-lg px-3.5 py-3 text-sm bg-success-50 text-success-700;
+  }
+  .alert-info {
+    @apply flex items-start gap-2.5 rounded-lg px-3.5 py-3 text-sm bg-brand-50 text-brand-800;
+  }
+}
+
+/* ── Motion ─────────────────────────────────────────────────── */
+
+@keyframes shakeWrong {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-5px); }
+  30%, 60%, 90% { transform: translateX(5px); }
+}
+
+@keyframes rippleExpand {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(20); opacity: 0; }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.08); }
+  75% { transform: scale(0.96); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(255 255 255 / 0); }
+  50% { box-shadow: 0 0 0 6px rgb(255 255 255 / 0.12); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.85); }
+  50% { opacity: 0.9; transform: scale(1.1); }
+}
+
+@keyframes floatDrift {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+.animate-twinkle { animation: twinkle 3.2s ease-in-out infinite; }
+.animate-drift { animation: floatDrift 5.5s ease-in-out infinite; }
+.animate-bob { animation: bob 2.4s ease-in-out infinite; }
+.shake-wrong { animation: shakeWrong 0.4s ease-in-out; }
+.bounce-in { animation: bounceIn 0.4s ease-out; }
+.fade-up { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pop-in { animation: popIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.slide-up { animation: slideUp 0.3s ease-out; }
+.pulse-glow { animation: pulseGlow 1.2s ease-in-out infinite; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee { animation: marquee 30s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

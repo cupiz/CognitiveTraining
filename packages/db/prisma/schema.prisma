@@ -1,0 +1,407 @@
+// ── Cognitive Training Platform — Prisma Schema ──────────
+// Mirrors docs/03_DATA_MODEL.md with all 13 tables,
+// relations, cascading policies, and suggested indexes.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ══════════════════════════════════════════════════════════
+// Enums
+// ══════════════════════════════════════════════════════════
+
+enum UserRole {
+  parent
+  admin
+  researcher
+}
+
+enum ChildStatus {
+  active
+  archived
+  deleted
+}
+
+enum ConsentType {
+  training
+  assessment
+  analytics
+  research
+}
+
+enum ConsentSource {
+  parent_portal
+  api
+  migration
+}
+
+enum CognitiveDomain {
+  working_memory
+  sustained_attention
+  processing_speed
+  inhibitory_control
+  cognitive_flexibility
+  visual_spatial
+}
+
+enum AssessmentStatus {
+  pending
+  in_progress
+  completed
+  interrupted
+  abandoned
+}
+
+enum TrainingSessionStatus {
+  pending
+  in_progress
+  completed
+  interrupted
+  abandoned
+}
+
+enum GameKey {
+  memory_matrix
+  target_watch
+  quick_match
+  stop_signal
+  rule_switch
+  spice_stall
+  red_light
+  courier_map
+  lighthouse_keeper
+  sushi_express
+  crystal_palace
+}
+
+enum GameRunStatus {
+  pending
+  in_progress
+  completed
+  interrupted
+}
+
+enum TelemetryEventType {
+  trial_started
+  stimulus_hidden
+  stimulus_shown
+  response
+  timeout
+  quality_flag
+  session_paused
+  session_resumed
+  session_ended
+}
+
+enum ReportStatus {
+  generating
+  ready
+  failed
+}
+
+// ══════════════════════════════════════════════════════════
+// Models
+// ══════════════════════════════════════════════════════════
+
+// ── Account ──────────────────────────────────────────────
+
+model Account {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  authProviderId String?   @map("auth_provider_id")
+  emailVerified  DateTime? @map("email_verified")
+  role           UserRole  @default(parent)
+  locale         String    @default("en")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  children ChildProfile[]
+  sessions Session[]
+  verificationTokens VerificationToken[]
+
+  @@map("accounts")
+}
+
+// ── Session ─────────────────────────────────────────────
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  accountId    String   @map("account_id") @db.Uuid
+  token        String   @unique
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([token])
+  @@map("sessions")
+}
+
+// ── VerificationToken ────────────────────────────────────
+
+model VerificationToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  accountId String   @map("account_id") @db.Uuid
+  token     String   @unique
+  type      String   // "email_verification" | "password_reset"
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@map("verification_tokens")
+}
+
+// ── ChildProfile ─────────────────────────────────────────
+
+model ChildProfile {
+  id               String      @id @default(uuid()) @db.Uuid
+  accountId        String      @map("account_id") @db.Uuid
+  displayName      String      @map("display_name") @db.VarChar(100)
+  birthMonth       Int         @map("birth_month") @db.SmallInt
+  birthYear        Int         @map("birth_year") @db.SmallInt
+  locale           String      @default("en")
+  accessibilityJson Json      @default("{}") @map("accessibility_json") @db.Json
+  status           ChildStatus @default(active)
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  account           Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  consentRecords    ConsentRecord[]
+  assessments       Assessment[]
+  trainingSessions  TrainingSession[]
+  domainPerformance DomainPerformance[]
+  adaptiveStates    AdaptiveState[]
+  trainingPlans     TrainingPlan[]
+  reports           Report[]
+
+  @@index([accountId])
+  @@map("child_profiles")
+}
+
+// ── ConsentRecord ────────────────────────────────────────
+
+model ConsentRecord {
+  id              String         @id @default(uuid()) @db.Uuid
+  childId         String         @map("child_id") @db.Uuid
+  consentType     ConsentType    @map("consent_type")
+  documentVersion String         @map("document_version")
+  grantedAt       DateTime       @default(now()) @map("granted_at")
+  revokedAt       DateTime?      @map("revoked_at")
+  source          ConsentSource
+
+  child ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+  @@map("consent_records")
+}
+
+// ── Assessment ───────────────────────────────────────────
+
+model Assessment {
+  id               String           @id @default(uuid()) @db.Uuid
+  childId          String           @map("child_id") @db.Uuid
+  assessmentVersion String          @map("assessment_version")
+  startedAt        DateTime?        @map("started_at")
+  completedAt      DateTime?        @map("completed_at")
+  status           AssessmentStatus @default(pending)
+  deviceContextJson Json            @default("{}") @map("device_context_json") @db.Json
+
+  child  ChildProfile    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  blocks AssessmentBlock[]
+
+  @@index([childId])
+  @@map("assessments")
+}
+
+// ── AssessmentBlock ──────────────────────────────────────
+
+model AssessmentBlock {
+  id          String          @id @default(uuid()) @db.Uuid
+  assessmentId String         @map("assessment_id") @db.Uuid
+  domain      CognitiveDomain
+  gameKey     GameKey         @map("game_key")
+  gameVersion String          @map("game_version")
+  taskVersion String          @map("task_version")
+  orderIndex  Int             @map("order_index") @db.SmallInt
+  config      Json            @default("{}") @db.Json
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@map("assessment_blocks")
+}
+
+// ── TrainingSession ──────────────────────────────────────
+
+model TrainingSession {
+  id                String                @id @default(uuid()) @db.Uuid
+  childId           String                @map("child_id") @db.Uuid
+  plannerVersion    String                @map("planner_version")
+  startedAt         DateTime?             @map("started_at")
+  completedAt       DateTime?             @map("completed_at")
+  status            TrainingSessionStatus @default(pending)
+  targetDurationSec Int                   @map("target_duration_sec")
+
+  child    ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
+  gameRuns GameRun[]
+
+  @@index([childId, startedAt(sort: Desc)])
+  @@map("training_sessions")
+}
+
+// ── GameRun ──────────────────────────────────────────────
+
+model GameRun {
+  id               String        @id @default(uuid()) @db.Uuid
+  sessionId        String        @map("session_id") @db.Uuid
+  gameKey          GameKey       @map("game_key")
+  gameVersion      String        @map("game_version")
+  configurationJson Json         @map("configuration_json") @db.Json
+  startedAt        DateTime?     @map("started_at")
+  endedAt          DateTime?     @map("ended_at")
+  status           GameRunStatus @default(pending)
+
+  session      TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rawEvents    RawEvent[]
+  taskMetrics  TaskMetric[]
+
+  @@index([sessionId])
+  @@map("game_runs")
+}
+
+// ── RawEvent ─────────────────────────────────────────────
+
+model RawEvent {
+  id              String            @id @default(uuid()) @db.Uuid
+  gameRunId       String            @map("game_run_id") @db.Uuid
+  sequenceNo      Int               @map("sequence_no")
+  eventType       TelemetryEventType @map("event_type")
+  clientTimeMs    Int               @map("client_time_ms")
+  payloadJson     Json              @map("payload_json") @db.Json
+  receivedAt      DateTime          @default(now()) @map("received_at")
+  idempotencyKey  String            @map("idempotency_key") @db.Uuid
+
+  gameRun GameRun @relation(fields: [gameRunId], references: [id], onDelete: Cascade)
+
+  @@unique([gameRunId, sequenceNo])
+  @@index([gameRunId])
+  @@map("raw_events")
+}
+
+// ── TaskMetric ───────────────────────────────────────────
+
+model TaskMetric {
+  id              String   @id @default(uuid()) @db.Uuid
+  gameRunId       String   @map("game_run_id") @db.Uuid
+  metricVersion   String   @map("metric_version")
+  accuracy        Decimal  @db.Decimal(5, 4) // 0.0000..1.0000
+  medianRtMs      Decimal  @map("median_rt_ms") @db.Decimal(10, 2)
+  meanRtMs        Decimal  @map("mean_rt_ms") @db.Decimal(10, 2)
+  rtVariability   Decimal  @map("rt_variability") @db.Decimal(10, 2)
+  omissionErrors  Int      @map("omission_errors")
+  commissionErrors Int     @map("commission_errors")
+  difficulty      Int      @db.SmallInt
+  validTrialCount Int      @map("valid_trial_count")
+  qualityFlagsJson Json   @default("{}") @map("quality_flags_json") @db.Json
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  gameRun GameRun @relation(fields: [gameRunId], references: [id], onDelete: Cascade)
+
+  @@index([gameRunId])
+  @@map("task_metrics")
+}
+
+// ── DomainPerformance ────────────────────────────────────
+
+model DomainPerformance {
+  id              String          @id @default(uuid()) @db.Uuid
+  childId         String          @map("child_id") @db.Uuid
+  domain          CognitiveDomain
+  score           Decimal         @db.Decimal(5, 2) // 0.00..100.00
+  confidence      Decimal         @db.Decimal(5, 4) // 0.0000..1.0000
+  windowStart     DateTime        @map("window_start")
+  windowEnd       DateTime        @map("window_end")
+  algorithmVersion String         @map("algorithm_version")
+  sourceRunCount  Int             @map("source_run_count")
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  child ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId, domain, createdAt(sort: Desc)])
+  @@map("domain_performance")
+}
+
+// ── AdaptiveState ────────────────────────────────────────
+
+model AdaptiveState {
+  id               String   @id @default(uuid()) @db.Uuid
+  childId          String   @map("child_id") @db.Uuid
+  gameKey          GameKey  @map("game_key")
+  abilityEstimate  Decimal  @map("ability_estimate") @db.Decimal(4, 2) // 0.00..10.00
+  uncertainty      Decimal  @db.Decimal(4, 2) // 0.00..5.00
+  currentDifficulty Int    @map("current_difficulty") @db.SmallInt
+  algorithmVersion String   @map("algorithm_version")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  child ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@unique([childId, gameKey])
+  @@map("adaptive_states")
+}
+
+// ── TrainingPlan ─────────────────────────────────────────
+
+model TrainingPlan {
+  id             String   @id @default(uuid()) @db.Uuid
+  childId        String   @map("child_id") @db.Uuid
+  plannerVersion String   @map("planner_version")
+  createdAt      DateTime @default(now()) @map("created_at")
+  expiresAt      DateTime @map("expires_at")
+  itemsJson      Json     @map("items_json") @db.Json
+
+  child ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId, createdAt(sort: Desc)])
+  @@map("training_plans")
+}
+
+// ── GameVisibility ───────────────────────────────────────
+// Admin-controlled visibility per game: hidden games do not
+// appear in the kid world map or the parent games page, but
+// remain fully usable by assessment/training pipelines.
+
+model GameVisibility {
+  gameKey   String   @id @map("game_key")
+  visible   Boolean  @default(false)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("game_visibility")
+}
+
+// ── Report ───────────────────────────────────────────────
+
+model Report {
+  id            String       @id @default(uuid()) @db.Uuid
+  childId       String       @map("child_id") @db.Uuid
+  periodStart   DateTime     @map("period_start")
+  periodEnd     DateTime     @map("period_end")
+  reportVersion String       @map("report_version")
+  summaryJson   Json         @map("summary_json") @db.Json
+  status        ReportStatus @default(generating)
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  child ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId, createdAt(sort: Desc)])
+  @@map("reports")
+}

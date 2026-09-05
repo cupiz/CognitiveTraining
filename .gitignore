@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# Local tooling
+.freebuff/
+.playwright-mcp/
+.mimosa/
+*.log
+query-events.mjs
+
+# TypeScript
+*.tsbuildinfo
+
+# pnpm
+pnpm-debug.log
