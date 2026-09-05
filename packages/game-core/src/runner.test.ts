@@ -43,7 +43,12 @@ function createMockGame(): CognitiveGame & {
     drainEvents: vi.fn(() => game.emittedEvents.splice(0)),
     getRenderState: vi.fn(() => ({ grid: [] })),
   };
-  return game;
+  // vi.fn() generics don't exactly match the CognitiveGame method shapes, but
+  // the mock implements the full contract at runtime.
+  return game as unknown as CognitiveGame & {
+    emittedEvents: BuiltEvent[];
+    summary: GameSummary;
+  };
 }
 
 function createMockContext(): GameContext {

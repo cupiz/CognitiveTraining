@@ -50,7 +50,6 @@ export function computeMetrics(events: RawEvent[], _difficulty: number): Compute
   const responseRts: number[] = [];
   const allRts: number[] = [];
   let correctCount = 0;
-  let incorrectCount = 0;
   let omissionErrors = 0;
   let commissionErrors = 0;
   const qualityFlags: QualityFlag[] = [];
@@ -95,7 +94,6 @@ export function computeMetrics(events: RawEvent[], _difficulty: number): Compute
       if (payload.correct) {
         correctCount++;
       } else {
-        incorrectCount++;
         commissionErrors++;
       }
     } else if (payload.responded !== undefined && payload.targetPresent !== undefined) {
@@ -103,7 +101,6 @@ export function computeMetrics(events: RawEvent[], _difficulty: number): Compute
       if (payload.responded && payload.targetPresent) {
         correctCount++;
       } else if (payload.responded && !payload.targetPresent) {
-        incorrectCount++;
         commissionErrors++;
       } else if (!payload.responded && payload.targetPresent) {
         omissionErrors++;
@@ -116,7 +113,6 @@ export function computeMetrics(events: RawEvent[], _difficulty: number): Compute
       if (payload.stopped) {
         correctCount++;
       } else {
-        incorrectCount++;
         commissionErrors++;
       }
     } else if (payload.selectedOption !== undefined && payload.correctOption !== undefined) {
@@ -124,7 +120,6 @@ export function computeMetrics(events: RawEvent[], _difficulty: number): Compute
       if (payload.selectedOption === payload.correctOption) {
         correctCount++;
       } else {
-        incorrectCount++;
         commissionErrors++;
       }
     }
