@@ -168,8 +168,13 @@ pnpm --filter @cog/web e2e    # 60 Playwright tests (production build)
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@cog.local` | `Admin123!` |
-| Parent (test) | `test@example.com` | `TestPass123!` |
+| Admin | `admin@cog.local` | Printed **once** by the seed script — or set `ADMIN_INITIAL_PASSWORD` to choose it |
+| Parent (test) | `test@example.com` | No login (placeholder hash) |
+
+No credentials live in this repository. The seed generates a random admin
+password and prints it once; set `ADMIN_INITIAL_PASSWORD` before seeding to
+pick your own (and rotate an existing admin's password by re-running the seed
+with the variable set).
 
 ## 🔐 Environment Variables
 
