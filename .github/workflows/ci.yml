@@ -31,11 +31,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build schemas (required by downstream packages)
-        run: pnpm --filter @cog/schemas build
-
-      - name: Build db package (required by web app)
-        run: pnpm --filter @cog/db build
+      # Package typechecks/tests resolve workspace deps from dist/ — build
+      # everything first (pnpm orders by dependency topology).
+      - run: pnpm -r build
 
       - run: pnpm -r typecheck
 
@@ -75,8 +73,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build schemas (required by game-core tests)
-        run: pnpm --filter @cog/schemas build
+      # Game tests import @cog/game-core from dist/ — build everything first.
+      - run: pnpm -r build
 
       - run: pnpm -r test:run
 
