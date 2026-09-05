@@ -18,7 +18,11 @@ export type GameKey =
   | "courier_map"
   | "lighthouse_keeper"
   | "sushi_express"
-  | "crystal_palace";
+  | "crystal_palace"
+  | "train_n_back"
+  | "dual_garden"
+  | "crystal_tower"
+  | "wide_view";
 
 // ── Cognitive Domain ─────────────────────────────────────
 

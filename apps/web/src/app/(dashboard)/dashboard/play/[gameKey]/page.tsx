@@ -3,7 +3,7 @@
 import { use, useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GameShell } from "@/components/game";
-import { MemoryMatrix, TargetWatch, QuickMatch, StopSignal, RuleSwitch, SpiceStall, RedLight, CourierMap, LighthouseKeeper, SushiExpress, CrystalPalace } from "@/components/games";
+import { MemoryMatrix, TargetWatch, QuickMatch, StopSignal, RuleSwitch, SpiceStall, RedLight, CourierMap, LighthouseKeeper, SushiExpress, CrystalPalace, TrainNBack, DualGarden, CrystalTower, WideView } from "@/components/games";
 import { MemoryMatrixGame } from "@cog/game-memory-matrix";
 import { TargetWatchGame } from "@cog/game-target-watch";
 import { QuickMatchGame } from "@cog/game-quick-match";
@@ -15,6 +15,10 @@ import { CourierMapGame } from "@cog/game-courier-map";
 import { LighthouseKeeperGame } from "@cog/game-lighthouse-keeper";
 import { SushiExpressGame } from "@cog/game-sushi-express";
 import { CrystalPalaceGame } from "@cog/game-crystal-palace";
+import { TrainNBackGame } from "@cog/game-train-n-back";
+import { DualGardenGame } from "@cog/game-dual-garden";
+import { CrystalTowerGame } from "@cog/game-crystal-tower";
+import { WideViewGame } from "@cog/game-wide-view";
 import type { CognitiveGame, GameSummary } from "@cog/game-core";
 import type { MMRenderState } from "@cog/game-memory-matrix";
 import type { TWRenderState } from "@cog/game-target-watch";
@@ -27,6 +31,10 @@ import type { CMRenderState } from "@cog/game-courier-map";
 import type { LKRenderState } from "@cog/game-lighthouse-keeper";
 import type { SXRenderState } from "@cog/game-sushi-express";
 import type { CPRenderState } from "@cog/game-crystal-palace";
+import type { TNBRenderState } from "@cog/game-train-n-back";
+import type { DGRenderState } from "@cog/game-dual-garden";
+import type { CTRenderState } from "@cog/game-crystal-tower";
+import type { WVRenderState } from "@cog/game-wide-view";
 import { Icon } from "@/components/ui/icons";
 import {
   createGameRun,
@@ -48,6 +56,10 @@ const GAME_FACTORIES: Record<string, () => CognitiveGame> = {
   lighthouse_keeper: () => new LighthouseKeeperGame(),
   sushi_express: () => new SushiExpressGame(),
   crystal_palace: () => new CrystalPalaceGame(),
+  train_n_back: () => new TrainNBackGame(),
+  dual_garden: () => new DualGardenGame(),
+  crystal_tower: () => new CrystalTowerGame(),
+  wide_view: () => new WideViewGame(),
 };
 
 const GAME_RENDERERS: Record<
@@ -114,6 +126,30 @@ const GAME_RENDERERS: Record<
   crystal_palace: (props) => (
     <CrystalPalace
       renderState={props.renderState as unknown as CPRenderState}
+      onCellTap={props.onCellTap}
+    />
+  ),
+  train_n_back: (props) => (
+    <TrainNBack
+      renderState={props.renderState as unknown as TNBRenderState}
+      onCellTap={props.onCellTap}
+    />
+  ),
+  dual_garden: (props) => (
+    <DualGarden
+      renderState={props.renderState as unknown as DGRenderState}
+      onCellTap={props.onCellTap}
+    />
+  ),
+  crystal_tower: (props) => (
+    <CrystalTower
+      renderState={props.renderState as unknown as CTRenderState}
+      onCellTap={props.onCellTap}
+    />
+  ),
+  wide_view: (props) => (
+    <WideView
+      renderState={props.renderState as unknown as WVRenderState}
       onCellTap={props.onCellTap}
     />
   ),

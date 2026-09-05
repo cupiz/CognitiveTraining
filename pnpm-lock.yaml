@@ -56,6 +56,12 @@ importers:
       '@cog/game-crystal-palace':
         specifier: workspace:*
         version: link:../../packages/game-crystal-palace
+      '@cog/game-crystal-tower':
+        specifier: workspace:*
+        version: link:../../packages/game-crystal-tower
+      '@cog/game-dual-garden':
+        specifier: workspace:*
+        version: link:../../packages/game-dual-garden
       '@cog/game-lighthouse-keeper':
         specifier: workspace:*
         version: link:../../packages/game-lighthouse-keeper
@@ -83,6 +89,12 @@ importers:
       '@cog/game-target-watch':
         specifier: workspace:*
         version: link:../../packages/game-target-watch
+      '@cog/game-train-n-back':
+        specifier: workspace:*
+        version: link:../../packages/game-train-n-back
+      '@cog/game-wide-view':
+        specifier: workspace:*
+        version: link:../../packages/game-wide-view
       '@cog/planner':
         specifier: workspace:*
         version: link:../../packages/planner
@@ -123,6 +135,9 @@ importers:
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
+      '@prisma/client':
+        specifier: 6.19.3
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
@@ -250,6 +265,38 @@ importers:
         version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
 
   packages/game-crystal-palace:
+    dependencies:
+      '@cog/game-core':
+        specifier: workspace:*
+        version: link:../game-core
+      '@cog/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
+
+  packages/game-crystal-tower:
+    dependencies:
+      '@cog/game-core':
+        specifier: workspace:*
+        version: link:../game-core
+      '@cog/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
+
+  packages/game-dual-garden:
     dependencies:
       '@cog/game-core':
         specifier: workspace:*
@@ -394,6 +441,38 @@ importers:
         version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
 
   packages/game-target-watch:
+    dependencies:
+      '@cog/game-core':
+        specifier: workspace:*
+        version: link:../game-core
+      '@cog/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
+
+  packages/game-train-n-back:
+    dependencies:
+      '@cog/game-core':
+        specifier: workspace:*
+        version: link:../game-core
+      '@cog/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
+
+  packages/game-wide-view:
     dependencies:
       '@cog/game-core':
         specifier: workspace:*

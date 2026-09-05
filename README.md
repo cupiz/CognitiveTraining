@@ -39,7 +39,7 @@ that parents can actually understand.
 
 | | |
 |---|---|
-| 🎮 Mini-games | **11** across **6** cognitive domains |
+| 🎮 Mini-games | **15** across **6** cognitive domains |
 | 📦 Packages | **15** in a pnpm monorepo |
 | ✅ Unit tests | **602** (Vitest) |
 | 🌐 E2E tests | **60** (Playwright) |
@@ -61,6 +61,10 @@ that parents can actually understand.
 | 🗼 **Penjaga Mercusuar (Lighthouse Keeper)** | Working Memory | Watch the lighthouse beam pattern, repeat it on the lantern panes. |
 | 🍣 **Sushi Express** | Processing Speed | Grab the ordered sushi plates off the moving belt. |
 | 💎 **Istana Kristal (Crystal Palace)** | Spatial Visual | Find every crystal that matches the sample in the palace. |
+| 🚂 **Kereta N-Back** | Working Memory (Updating) | Wagons pass by — ring the bell when the fruit matches n wagons back. |
+| 🌷 **Kebun Dua Arus** | Divided Attention | Two streams at once — mark only when both hit their targets. |
+| 🗼 **Menara Kristal (Crystal Tower)** | Planning | Tower-of-Hanoi: move all crystals before moves or time run out. |
+| 🔭 **Binocular (Wide View)** | Visual Scanning | Catch where the bird flashed while watching the centre. |
 
 Every game ships with 10 difficulty levels (D1–D10), a no-stakes practice phase,
 kid-readable in-arena instructions, a per-trial time bar, and pause-safe timers.

@@ -111,6 +111,42 @@ const DOMAIN_MAPPINGS: DomainMapping[] = [
       sustained_attention: 0.2,
     },
   },
+  {
+    gameKey: "train_n_back",
+    primaryDomain: "working_memory",
+    secondaryDomains: ["sustained_attention"],
+    weights: {
+      working_memory: 0.85,
+      sustained_attention: 0.15,
+    },
+  },
+  {
+    gameKey: "dual_garden",
+    primaryDomain: "sustained_attention",
+    secondaryDomains: ["inhibitory_control"],
+    weights: {
+      sustained_attention: 0.7,
+      inhibitory_control: 0.3,
+    },
+  },
+  {
+    gameKey: "crystal_tower",
+    primaryDomain: "cognitive_flexibility",
+    secondaryDomains: ["visual_spatial"],
+    weights: {
+      cognitive_flexibility: 0.6,
+      visual_spatial: 0.4,
+    },
+  },
+  {
+    gameKey: "wide_view",
+    primaryDomain: "sustained_attention",
+    secondaryDomains: ["visual_spatial"],
+    weights: {
+      sustained_attention: 0.6,
+      visual_spatial: 0.4,
+    },
+  },
 ];
 
 // ── Lookup Maps ──────────────────────────────────────────

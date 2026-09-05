@@ -66,6 +66,10 @@ export const GameKey = z.enum([
   "lighthouse_keeper",
   "sushi_express",
   "crystal_palace",
+  "train_n_back",
+  "dual_garden",
+  "crystal_tower",
+  "wide_view",
 ]);
 export type GameKey = z.infer<typeof GameKey>;
 

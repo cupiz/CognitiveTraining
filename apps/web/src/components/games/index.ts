@@ -9,3 +9,7 @@ export { CourierMap } from "./CourierMap";
 export { LighthouseKeeper } from "./LighthouseKeeper";
 export { SushiExpress } from "./SushiExpress";
 export { CrystalPalace } from "./CrystalPalace";
+export { TrainNBack } from "./TrainNBack";
+export { DualGarden } from "./DualGarden";
+export { CrystalTower } from "./CrystalTower";
+export { WideView } from "./WideView";

@@ -175,6 +175,10 @@ const GAME_VERSIONS: Record<GameKey, string> = {
   lighthouse_keeper: "0.1.0",
   sushi_express: "0.1.0",
   crystal_palace: "0.1.0",
+  train_n_back: "0.1.0",
+  dual_garden: "0.1.0",
+  crystal_tower: "0.1.0",
+  wide_view: "0.1.0",
 };
 
 /**

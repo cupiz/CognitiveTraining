@@ -19,6 +19,10 @@ const GAMES = [
   { key: "lighthouse_keeper", marker: "Penjaga Mercusuar" },
   { key: "sushi_express", marker: "Sushi Express" },
   { key: "crystal_palace", marker: "Temukan semua kristal yang cocok" },
+  { key: "train_n_back", marker: "Bunyikan lonceng" },
+  { key: "dual_garden", marker: "Misi:" },
+  { key: "crystal_tower", marker: "antar semua kristal ke menara kanan" },
+  { key: "wide_view", marker: "posisi burung yang berkedip" },
 ];
 
 test.describe("Game availability", () => {

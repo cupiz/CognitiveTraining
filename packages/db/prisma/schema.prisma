@@ -77,6 +77,10 @@ enum GameKey {
   lighthouse_keeper
   sushi_express
   crystal_palace
+  train_n_back
+  dual_garden
+  crystal_tower
+  wide_view
 }
 
 enum GameRunStatus {

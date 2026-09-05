@@ -138,6 +138,14 @@ const CONTENT: Record<"en" | "id", LandingContent> = {
         "Tap the sushi plates that match the customer's order as they ride past on the belt.",
       crystal_palace:
         "Spot every crystal in the courtyard that matches the target's colour and cut.",
+      train_n_back:
+        "Wagons pass by one by one — ring the bell when the fruit matches an earlier wagon.",
+      dual_garden:
+        "An animal crosses above while a fruit falls below — mark only the double matches.",
+      crystal_tower:
+        "Move the crystals to the target tower, planning each step before you tap.",
+      wide_view:
+        "Keep an eye on the centre symbol — and catch where the bird flashes around the screen.",
     },
     faqEyebrow: "Questions?",
     faqTitle: "Parents usually ask",
@@ -317,6 +325,14 @@ const CONTENT: Record<"en" | "id", LandingContent> = {
         "Ketuk peta untuk mengantar paket ke bendera, mengikuti aturan yang sedang aktif.",
       lighthouse_keeper:
         "Perhatikan pancaran warna mercusuar, lalu ulangi urutannya di kaca pelita.",
+      train_n_back:
+        "Gerbong lewat satu per satu — bunyikan lonceng saat buahnya sama dengan gerbong sebelumnya.",
+      dual_garden:
+        "Hewan melintas di atas, buah jatuh di bawah — tandai hanya saat keduanya sesuai target.",
+      crystal_tower:
+        "Antar kristal ke menara tujuan — rencanakan langkahmu sebelum menekan.",
+      wide_view:
+        "Awasi simbol di tengah — dan tangkap posisi burung yang berkedip di tepi layar.",
       sushi_express:
         "Ketuk piring sushi yang sesuai pesanan saat lewat di ban berjalan.",
       crystal_palace:

@@ -82,6 +82,34 @@ export const GAME_HOWTO: Record<string, { steps: string[] }> = {
       "Kristal yang beda jangan diketuk — kumpulkan semua yang cocok!",
     ],
   },
+  train_n_back: {
+    steps: [
+      "Perhatikan buah di tiap gerbong kereta 🚂.",
+      "Bunyikan lonceng 🔔 kalau buahnya sama dengan gerbong sebelumnya!",
+      "Kalau buahnya beda, diam saja — jangan bunyikan lonceng.",
+    ],
+  },
+  dual_garden: {
+    steps: [
+      "Hewan melintas di jembatan atas, buah jatuh di bawah.",
+      "Ketuk Tandai 🚩 hanya kalau keduanya sesuai target di banner.",
+      "Kalau salah satunya beda, diam dulu ya!",
+    ],
+  },
+  crystal_tower: {
+    steps: [
+      "Ketuk menara untuk mengangkat kristal di paling atas.",
+      "Ketuk menara lain untuk menaruhnya — kristal besar tak boleh di atas yang kecil.",
+      "Antar semua kristal ke menara kanan sebelum langkah habis!",
+    ],
+  },
+  wide_view: {
+    steps: [
+      "Awasi simbol di kotak tengah layar.",
+      "Burung 🐦 akan berkedip sebentar di sekeliling layar — ingat posisinya!",
+      "Setelah itu, ketuk posisi burung yang tadi muncul.",
+    ],
+  }
 };
 
 export const HOWTO_FALLBACK: { steps: string[] } = {
