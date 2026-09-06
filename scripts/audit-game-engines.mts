@@ -6,11 +6,17 @@
  * never call trials.endTrial(), never leave practice mode, or record every
  * response as wrong, so the result screen shows 0 forever.
  *
+ * Pass 1 — practiceTrials=0: every trial is scored; an honest full play must
+ *          produce valid=total, accuracy > 0 and zero omissions.
+ * Pass 2 — practiceTrials=2: exercises the practice→scored transition; the
+ *          scored board must start clean and practice trials must stay out
+ *          of the summary.
+ *
  * Each driver plays honestly (perfect info from render state, deterministic
  * seed), like the engine's own unit tests. Real timers are used, so the whole
  * audit takes a couple of minutes.
  *
- * Run:  pnpm tsx scripts/audit-game-engines.mts
+ * Run:  pnpm audit:games
  */
 import { performance } from "node:perf_hooks";
 
@@ -100,12 +106,17 @@ async function runUntilFinished(
 }
 
 // ── Per-game drivers (honest play, deterministic outcome) ───────────────
-type Driver = (game: any) => Promise<void>;
+type Driver = (game: any, onTransition?: (game: any, phase: string) => void) => Promise<void>;
 
 const drivers: Record<string, Driver> = {
-  courier_map: async (g) => {
+  courier_map: async (g, onTransition) => {
     let lastMove = "";
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "waiting" || !s.layout) return;
       if (s.currentPosition === s.layout.goalNode) return;
       // BFS over unblocked, rule-passable edges (the goal is always allowed).
@@ -146,16 +157,22 @@ const drivers: Record<string, Driver> = {
     });
   },
 
-  crystal_palace: async (g) => {
+  crystal_palace: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "waiting" || !s.grid) return;
       const match = s.grid.cells.find((c: any) => c.isMatch && !s.tappedIndices.includes(c.id));
       if (match) tap(g, match.id);
     });
   },
 
-  crystal_tower: async (g) => {
+  crystal_tower: async (g, onTransition) => {
     // Optimal 3-disk Hanoi plan (difficulty 1), executed move by move.
+    let prevPhase = "";
     const plan: number[][] = [];
     const hanoi = (n: number, from: number, to: number, aux: number) => {
       if (n === 0) return;
@@ -166,6 +183,10 @@ const drivers: Record<string, Driver> = {
     hanoi(3, 0, 2, 1);
     let moveIdx = 0;
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "solving" && s.phase !== "selected") return;
       if (s.disks !== 3) throw new Error(`audit assumes 3 disks at D1, got ${s.disks}`);
       if (s.moves === 0 && s.selectedPeg === -1) moveIdx = 0; // fresh puzzle
@@ -176,9 +197,14 @@ const drivers: Record<string, Driver> = {
     });
   },
 
-  dual_garden: async (g) => {
+  dual_garden: async (g, onTransition) => {
     // Honest play: mark only when the watched stream(s) match.
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "round" || !s.awaitingResponse) return;
       const shouldMark = s.requireBoth
         ? s.currentAnimal === s.targetAnimal && s.currentFruit === s.targetFruit
@@ -187,16 +213,26 @@ const drivers: Record<string, Driver> = {
     });
   },
 
-  lighthouse_keeper: async (g) => {
+  lighthouse_keeper: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "waiting" || s.showSequence) return;
       const next = s.sequence[s.tappedIndices.length];
       if (next !== undefined) tap(g, next);
     });
   },
 
-  memory_matrix: async (g) => {
+  memory_matrix: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "waiting") return;
       // The engine auto-submits at targetCount selections; feed two targets.
       const idx = s.selectedCells.length === 0 ? (s.targetCells[1] ?? s.targetCells[0]) : s.targetCells[0];
@@ -204,8 +240,13 @@ const drivers: Record<string, Driver> = {
     });
   },
 
-  pair_cards: async (g) => {
+  pair_cards: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "play" || s.firstPick !== -1) return;
       // Perfect-info pairing, same technique as the engine's own unit test.
       const byPair = new Map<number, number[]>();
@@ -218,14 +259,24 @@ const drivers: Record<string, Driver> = {
     });
   },
 
-  quick_match: async (g) => {
+  quick_match: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase === "matching" && s.selectedIndex === -1) tap(g, s.targetIndex);
     });
   },
 
-  red_light: async (g) => {
+  red_light: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       // Run on green; hold through red (isStopTrial is exposed in render state).
       if (s.phase === "go" && !s.isStopTrial) tap(g, 0);
     });
@@ -237,26 +288,41 @@ const drivers: Record<string, Driver> = {
     });
   },
 
-  spice_stall: async (g) => {
+  spice_stall: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "waiting") return;
       const next = s.order[s.tappedIndices.length];
       if (next !== undefined) tap(g, next);
     });
   },
 
-  stop_signal: async (g) => {
+  stop_signal: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase === "go" && !s.isStopTrial) tap(g, s.goDirection === "left" ? 0 : 1);
     });
   },
 
-  sushi_express: async (g) => {
+  sushi_express: async (g, onTransition) => {
     // Mirror the engine's serve-zone math (SERVE_ZONE_LEFT 0.72 → RIGHT 0.92)
     // and serve only target plates while they cross the zone.
+    let prevPhase = "";
     await runUntilFinished(
       g,
       (s) => {
+        if (s.phase !== prevPhase) {
+          prevPhase = s.phase;
+          onTransition?.(g, s.phase);
+        }
         if (s.phase !== "waiting") return;
         const elapsed = Math.max(0, performance.now() - g.responseStartMs);
         const plate = (s.plates as Array<{ id: number; isTarget: boolean }>).find((p) => {
@@ -271,24 +337,39 @@ const drivers: Record<string, Driver> = {
     );
   },
 
-  tap_critter: async (g) => {
+  tap_critter: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase === "pop" && s.currentHole >= 0 && s.currentKind === "critter") tap(g, s.currentHole);
       // decoys left alone → correct rejections
     });
   },
 
-  target_watch: async (g) => {
+  target_watch: async (g, onTransition) => {
     // Tap only on the target symbol: hits on targets, correct rejections on
     // the rest — deterministic accuracy = 1.
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase === "waiting" && !s.responded && s.isTarget) tap(g, 0);
     });
   },
 
-  train_n_back: async (g) => {
+  train_n_back: async (g, onTransition) => {
     // Ring the bell only on true n-back matches (peek the fruit history).
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase !== "wagon" || !s.awaitingResponse) return;
       const fruits = g.fruits as string[];
       const cur = fruits[fruits.length - 1];
@@ -297,8 +378,13 @@ const drivers: Record<string, Driver> = {
     });
   },
 
-  wide_view: async (g) => {
+  wide_view: async (g, onTransition) => {
+    let prevPhase = "";
     await runUntilFinished(g, (s) => {
+      if (s.phase !== prevPhase) {
+        prevPhase = s.phase;
+        onTransition?.(g, s.phase);
+      }
       if (s.phase === "probe" && s.probedSlot === -1) {
         // A child who watched the flash knows the slot (peek flashSlot).
         tap(g, g.flashSlot ?? 0);
@@ -334,27 +420,69 @@ const RED = "\x1b[31m";
 const DIM = "\x1b[2m";
 const RESET = "\x1b[0m";
 
-async function auditGame(key: string, Ctor: new () => any, maxTrials: number): Promise<AuditResult> {
+/**
+ * Simulates a full round with practiceTrials practice attempts before the
+ * scored board, then returns the summary after finish(). Shared by both
+ * audit passes.
+ */
+async function playRound(
+  Ctor: new () => any,
+  key: string,
+  maxTrials: number,
+  practiceTrials: number,
+  /** Runs after every boot/transition, before normal driving resumes. */
+  onTransition?: (game: any, phase: string) => void,
+): Promise<{ game: any; summary: GameSummary }> {
   const game = new Ctor();
-  try {
-    game.start(makeContext(key, maxTrials));
-    const driver = drivers[key];
-    if (!driver) return { key, ok: false, error: "no driver registered" };
-    await driver(game);
-    const summary: GameSummary = game.finish();
+  const ctx = makeContext(key, maxTrials);
+  ctx.practiceTrials = practiceTrials;
+  game.start(ctx);
+  const driver = drivers[key];
+  if (!driver) throw new Error("no driver registered");
+  await driver(game, onTransition);
+  const summary: GameSummary = game.finish();
+  return { game, summary };
+}
 
-    // ── Assertions: the zero-metrics bug class ──
+async function auditGame(key: string, Ctor: new () => any, maxTrials: number): Promise<AuditResult> {
+  try {
+    // ── Pass 1 — scored-only round (practiceTrials=0) ──
+    const { summary } = await playRound(Ctor, key, maxTrials, 0);
     const problems: string[] = [];
     if (!summary.validTrials || summary.validTrials <= 0) problems.push(`validTrials=${summary.validTrials}`);
     if (summary.accuracy === undefined || summary.accuracy <= 0) problems.push(`accuracy=${summary.accuracy}`);
     if (!summary.totalTrials || summary.totalTrials <= 0) problems.push(`totalTrials=${summary.totalTrials}`);
     if (summary.accuracy !== undefined && summary.accuracy > 1) problems.push(`accuracy=${summary.accuracy} (>1)`);
-
-    // Honest-play drivers should never produce omissions.
     if (problems.length === 0 && summary.omissionErrors > 0) {
       problems.push(`omissionErrors=${summary.omissionErrors} despite honest full play`);
     }
     if (problems.length > 0) return { key, ok: false, summary, error: problems.join(", ") };
+
+    // ── Pass 2 — practice→scored transition (practiceTrials=2) ──
+    const seen: string[] = [];
+    const { summary: summary2, game } = await playRound(Ctor, key, maxTrials, 2, (_game, phase) => {
+      if (seen[seen.length - 1] !== phase) seen.push(phase);
+    });
+    const problems2: string[] = [];
+
+    // The practice trials must be excluded from the scored summary.
+    if (summary2.validTrials !== summary.validTrials) {
+      problems2.push(`validTrials=${summary2.validTrials} with 2 practice trials (expected ${summary.validTrials})`);
+    }
+    if ((summary2.totalTrials ?? 0) <= summary.totalTrials) {
+      problems2.push(
+        `totalTrials=${summary2.totalTrials} with 2 practice trials (expected > ${summary.totalTrials})`,
+      );
+    }
+    if (summary2.accuracy === undefined || summary2.accuracy <= 0) problems2.push(`accuracy=${summary2.accuracy}`);
+
+    // The scored board must have started clean — replay through the engine.
+    const phase2 = game.getRenderState().phase as string;
+    if (phase2 !== "finished" && game.gameMode === "practice") {
+      problems2.push("still in practice mode after a full round");
+    }
+
+    if (problems2.length > 0) return { key, ok: false, summary: summary2, error: problems2.join(", ") };
     return { key, ok: true, summary };
   } catch (err) {
     return { key, ok: false, error: err instanceof Error ? err.message : String(err) };
@@ -362,7 +490,7 @@ async function auditGame(key: string, Ctor: new () => any, maxTrials: number): P
 }
 
 async function main() {
-  console.log(`Auditing ${REGISTRY.length} game engines — one full scored round each...\n`);
+  console.log(`Auditing ${REGISTRY.length} game engines — scored round + practice→scored transition each...\n`);
   const t0 = Date.now();
 
   const results: AuditResult[] = [];
