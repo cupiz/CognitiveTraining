@@ -25,8 +25,12 @@ function hpCss(): string {
     @keyframes hp-go { 0%,58% { opacity:1 } 66%,100% { opacity:0 } }
     @keyframes hp-stop { 0%,58% { opacity:0 } 66%,100% { opacity:1 } }
     @keyframes hp-run { 0% { transform:translateX(-18px) } 55% { transform:translateX(18px) } 58%,100% { transform:translateX(18px) } }
-    @keyframes hp-route { 0% { transform:translate(0,0) } 30% { transform:translate(36px,0) } 62% { transform:translate(36px,-32px) } 100% { transform:translate(36px,-32px) } }
+    @keyframes hp-route { 0% { transform:translate(0,0) } 30% { transform:translate(36px,0) } 62% { transform:translate(36px,-32px) } 100% { transform:translate(0,0) } }
     @keyframes hp-ring { 0%,45% { transform:translateX(0) } 55%,100% { transform:translateX(74px) } }
+    @keyframes hp-peek { 0%,18% { transform:translateY(58px) } 40%,62% { transform:translateY(4px) } 84%,100% { transform:translateY(58px) } }
+    @keyframes hp-tap { 0%,20% { opacity:0; transform:scale(.4) } 32%,72% { opacity:1; transform:scale(1) } 84%,100% { opacity:0; transform:scale(.4) } }
+    @keyframes hp-flip { 0%,18% { transform:rotateY(0deg) } 34%,82% { transform:rotateY(180deg) } 98%,100% { transform:rotateY(360deg) } }
+    @keyframes hp-hint { 0%,55% { opacity:0 } 68%,92% { opacity:1 } 100% { opacity:0 } }
     @keyframes hp-halfa { 0%,45% { opacity:1 } 55%,100% { opacity:.35 } }
     @keyframes hp-halfb { 0%,45% { opacity:.35 } 55%,100% { opacity:1 } }
     @media (prefers-reduced-motion: reduce) {
@@ -522,6 +526,91 @@ function WideViewScene({ accent }: { accent: string }) {
   );
 }
 
+function TapCritterScene({ accent }: { accent: string }) {
+  return (
+    <div className="relative flex h-[88px] w-48 items-center justify-center">
+      <div
+        className="relative h-[76px] w-[150px] overflow-hidden rounded-xl border-2"
+        style={{
+          borderColor: hexToRgba(accent, 0.5),
+          background: "linear-gradient(180deg, #9fdcf5 0%, #c8ecd2 45%, #8fce74 100%)",
+        }}
+      >
+        {/* three garden holes */}
+        <div className="absolute inset-x-3 bottom-2 flex items-end justify-around">
+          {["🐹", "🌵", ""].map((glyph, i) => (
+            <span key={i} className="relative flex h-6 w-11 items-end justify-center overflow-hidden rounded-[50%] border-2 border-[#7a5a35] bg-gradient-to-b from-[#4a3b22] to-[#2e2517]">
+              {glyph && (
+                <span
+                  className="absolute text-lg leading-none"
+                  style={{
+                    animation: `hp-peek 2.6s ease-in-out infinite`,
+                    animationDelay: `${i * 0.8}s`,
+                    filter: glyph === "🌵" ? "saturate(0.4)" : "drop-shadow(0 1px 1px rgb(0 0 0 / 0.3))",
+                  }}
+                >
+                  {glyph}
+                </span>
+              )}
+            </span>
+          ))}
+        </div>
+        {/* tap spark over the critter hole (outside the clipped hole) */}
+        <span
+          className="absolute bottom-[30px] left-[26px] text-xs"
+          style={{ animation: "hp-tap 2.6s ease-in-out infinite" }}
+        >
+          ✨
+        </span>
+        {/* sun */}
+        <span className="absolute right-1.5 top-1.5 size-3.5 rounded-full bg-[#ffe27a] shadow-[0_0_10px_3px_rgb(255_226_122/0.55)]" />
+      </div>
+    </div>
+  );
+}
+
+function PairCardsScene() {
+  return (
+    <div className="flex h-[88px] items-center gap-2.5">
+      {/* two face-down cards flipping to reveal a twin pair */}
+      {["🐬", "🐬"].map((face, i) => (
+        <span key={i} className="relative block h-[62px] w-[46px]" style={{ perspective: "400px" }}>
+          <span
+            className="absolute inset-0 rounded-lg border-2 [transform-style:preserve-3d]"
+            style={{
+              borderColor: "#c9a44d",
+              animation: `hp-flip 3.2s ease-in-out infinite`,
+              animationDelay: `${i * 0.35}s`,
+            }}
+          >
+            {/* card back (front side) */}
+            <span
+              className="absolute inset-0 flex items-center justify-center rounded-md bg-gradient-to-br from-[#3f7ec7] to-[#2a5ea8] [backface-visibility:hidden]"
+            >
+              <span className="text-sm opacity-70">🏝️</span>
+            </span>
+            {/* twin face (reverse side) */}
+            <span
+              className="absolute inset-0 flex items-center justify-center rounded-md border-2 border-[#2f9e63] bg-gradient-to-b from-[#fffdf4] to-[#fff0c9] text-xl [backface-visibility:hidden]"
+              style={{ transform: "rotateY(180deg)" }}
+            >
+              {face}
+            </span>
+          </span>
+        </span>
+      ))}
+      {/* match marker */}
+      <span className="flex size-8 items-center justify-center rounded-full border-2 border-[#2f9e63] bg-[#eaf9f1] text-sm text-[#2f9e63]" style={{ animation: "hp-hint 3.2s ease-in-out infinite" }}>
+        ✓
+      </span>
+      {/* a face-down card left to explore */}
+      <span className="flex h-[62px] w-[46px] items-center justify-center rounded-lg border-2 border-[#c9a44d] bg-gradient-to-br from-[#3f7ec7] to-[#2a5ea8]">
+        <span className="text-sm opacity-70">🏝️</span>
+      </span>
+    </div>
+  );
+}
+
 /* ── dispatcher ───────────────────────────────────────── */
 
 
@@ -557,6 +646,10 @@ function scene(gameKey: string, accent: string): React.ReactNode {
       return <CrystalTowerScene accent={accent} />;
     case "wide_view":
       return <WideViewScene accent={accent} />;
+    case "tap_critter":
+      return <TapCritterScene accent={accent} />;
+    case "pair_cards":
+      return <PairCardsScene />;
     default:
       return (
         <div className="flex items-center gap-2 text-2xl">
