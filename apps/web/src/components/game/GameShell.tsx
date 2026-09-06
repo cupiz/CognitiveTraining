@@ -183,11 +183,11 @@ export function GameShell({
         }
       }
 
-      animFrameRef.current = requestAnimationFrame(tick);
+      animFrameRef.current = window.setTimeout(tick, 100);
     }
 
-    animFrameRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(animFrameRef.current);
+    animFrameRef.current = window.setTimeout(tick, 100);
+    return () => clearTimeout(animFrameRef.current);
   }, [state]);
 
   // ── Pause: tab hidden, or the layout's pause modal (pause bus) ──

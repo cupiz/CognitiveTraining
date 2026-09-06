@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "typeRoots": ["../node_modules/.pnpm/@types+node@22.20.1/node_modules/@types"],
+    "paths": {
+      "@cog/game-core": ["../packages/game-core/src/index.ts"],
+      "@cog/schemas": ["../packages/schemas/src/index.ts"]
+    },
+    "noEmit": true
+  },
+  "include": ["*.mts"]
+}

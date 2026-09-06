@@ -97,6 +97,23 @@ describe("TapCritterGame", () => {
     vi.useRealTimers();
   });
 
+  it("scores a full round: every pop becomes a finished, correct trial", () => {
+    const game = new TapCritterGame();
+    game.start(makeContext({ practiceTrials: 0, maxTrials: 5, difficulty: 1 }));
+    vi.useFakeTimers();
+    for (let i = 0; i < 40 && game.getPhase() !== "finished"; i++) {
+      vi.advanceTimersByTime(50);
+      const state = game.getRenderState() as { phase: string; currentHole: number };
+      if (state.phase === "pop" && state.currentHole >= 0) tapHole(game, state.currentHole);
+      vi.advanceTimersByTime(1000);
+    }
+    const summary = game.finish();
+    expect(summary.validTrials).toBe(5);
+    expect(summary.accuracy).toBe(1);
+    expect(summary.commissionErrors).toBe(0);
+    vi.useRealTimers();
+  });
+
   it("tapping the occupied hole closes the pop early", () => {
     const game = new TapCritterGame();
     game.start(makeContext({ practiceTrials: 0 }));

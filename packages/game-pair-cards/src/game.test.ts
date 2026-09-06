@@ -123,6 +123,48 @@ describe("PairCardsGame", () => {
     vi.useRealTimers();
   });
 
+  it("scores a full round: attempts count as finished, non-practice trials", () => {
+    vi.useFakeTimers();
+    const game = new PairCardsGame();
+    game.start(makeContext({ difficulty: 1, practiceTrials: 0 }));
+    vi.advanceTimersByTime(3000); // preview over
+
+    const ids = (game as unknown as { cards: { pairId: number }[] }).cards.map((c) => c.pairId);
+    const byPair = new Map<number, number[]>();
+    ids.forEach((pairId, idx) => {
+      byPair.set(pairId, [...(byPair.get(pairId) ?? []), idx]);
+    });
+    for (const [, [a, b]] of byPair) {
+      flipCard(game, a);
+      flipCard(game, b);
+    }
+    const summary = game.finish();
+    expect(summary.validTrials).toBe(4);
+    expect(summary.accuracy).toBe(1);
+    expect(game.getRenderState().isPractice).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it("transitions out of practice mode after the practice attempts", () => {
+    vi.useFakeTimers();
+    const game = new PairCardsGame();
+    game.start(makeContext({ difficulty: 1, practiceTrials: 1 }));
+    vi.advanceTimersByTime(3000); // practice preview over
+
+    // Deliberately mismatch one attempt to burn the single practice attempt.
+    const pairIds = (game as unknown as { cards: { pairId: number }[] }).cards.map((c) => c.pairId);
+    const second = pairIds.findIndex((pid, idx) => idx !== 0 && pid !== pairIds[0]);
+    flipCard(game, 0);
+    flipCard(game, second);
+    vi.advanceTimersByTime(1200); // flip-back resolves
+    vi.advanceTimersByTime(1600); // countdown transition re-deals
+    vi.advanceTimersByTime(3000); // scored-round preview over
+
+    expect(game.getRenderState().isPractice).toBe(false);
+    expect(game.getRenderState().matchedPairs).toBe(0); // fresh board
+    vi.useRealTimers();
+  });
+
   it("cannot pause when idle", () => {
     const game = new PairCardsGame();
     game.pause();

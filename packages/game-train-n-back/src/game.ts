@@ -271,6 +271,7 @@ export class TrainNBackGame extends BaseGame {
 
   private endWagon(): void {
     this.clearTimers();
+    this.trials.endTrial();
 
     if (this.isCurrentPracticeTrial) {
       this.practiceCount++;

@@ -308,6 +308,7 @@ export class CrystalTowerGame extends BaseGame {
 
   private endPuzzle(): void {
     this.clearTimers();
+    this.trials.endTrial();
 
     if (this.isCurrentPracticeTrial) {
       this.practiceCount++;

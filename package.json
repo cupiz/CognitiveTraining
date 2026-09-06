@@ -13,6 +13,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "vitest",
     "test:run": "vitest run",
+    "audit:games": "tsx scripts/audit-game-engines.mts",
     "test:ui": "vitest --ui",
     "db:generate": "pnpm --filter @cog/db generate",
     "db:migrate": "pnpm --filter @cog/db migrate",

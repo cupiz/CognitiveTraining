@@ -295,6 +295,7 @@ export class WideViewGame extends BaseGame {
 
   private endTrial(): void {
     this.clearTimers();
+    this.trials.endTrial();
 
     if (this.isCurrentPracticeTrial) {
       this.practiceCount++;

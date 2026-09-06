@@ -270,6 +270,7 @@ export class DualGardenGame extends BaseGame {
 
   private endRound(): void {
     this.clearTimers();
+    this.trials.endTrial();
 
     if (this.isCurrentPracticeTrial) {
       this.practiceCount++;

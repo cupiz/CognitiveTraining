@@ -79,9 +79,42 @@ export class PairCardsGame extends BaseGame {
   private currentTrialId = "";
   private awaitingResponse = true;
   private maxRounds = 1;
+  private practiceAttempts = 0;
+  private isCurrentPracticeAttempt = false;
+  private flipStartedAt = 0;
+  private matchRts: number[] = [];
 
   private clearTimers(): void {
     this.clearAllPausableTimers();
+  }
+
+  /** Close out the open two-card attempt (practice rounds included). */
+  private endAttempt(): void {
+    this.trials.endTrial();
+    if (this.isCurrentPracticeAttempt) {
+      this.practiceAttempts++;
+      this.isCurrentPracticeAttempt = false;
+      if (this.practiceAttempts >= (this.context.practiceTrials ?? 0)) {
+        this.gameMode = "countdown";
+        this.pcPhase = "countdown"; // block input during the transition window
+        this.firstPick = -1;
+        this.feedbackKind = null;
+        this.rebuildBoardForScoredRound();
+      }
+    }
+  }
+
+  /** Fresh board for the scored round after practice ends. */
+  private rebuildBoardForScoredRound(): void {
+    this.armTimer("countdownTransition", 1500, () => {
+      this.gameMode = "playing"; // scored round is live again
+      this.matchedPairs = 0;
+      this.attempts = 0;
+      this.mismatches = 0;
+      this.trialNumber = 0;
+      this.buildBoard();
+      this.startPreviewChain();
+    });
   }
 
   // Pause state
@@ -109,6 +142,9 @@ export class PairCardsGame extends BaseGame {
     this.feedbackKind = null;
     this.trialNumber = 0;
     this.score = 0;
+    this.practiceAttempts = 0;
+    this.isCurrentPracticeAttempt = false;
+    this.matchRts = [];
 
     this.pcPhase = context.practiceTrials > 0 ? "practice" : "countdown";
     this.gameMode = context.practiceTrials > 0 ? "practice" : "playing";
@@ -128,6 +164,11 @@ export class PairCardsGame extends BaseGame {
     if (this.cards[idx].matched || this.cards[idx].flipped) return;
 
     this.handleCardTap(idx);
+  }
+
+  /** While paused the engine re-deals nothing; board is frozen as-is. */
+  get boardSize(): number {
+    return this.cards.length;
   }
 
   pause(): void {
@@ -154,6 +195,11 @@ export class PairCardsGame extends BaseGame {
       totalTrials: this.trials.totalTrials,
       validTrials: this.trials.scoredTrialCount,
       accuracy: this.trials.accuracy,
+      medianRtMs:
+        this.matchRts.length > 0
+          ? this.matchRts.slice().sort((a, b) => a - b)[Math.floor((this.matchRts.length - 1) / 2)]
+          : undefined,
+      meanRtMs: this.matchRts.length > 0 ? this.matchRts.reduce((s, r) => s + r, 0) / this.matchRts.length : undefined,
       omissionErrors: this.trials.omissionErrors,
       commissionErrors: this.trials.commissionErrors,
       qualityFlags: this.trials.allQualityFlags,
@@ -215,7 +261,10 @@ export class PairCardsGame extends BaseGame {
 
     if (this.firstPick === -1) {
       this.firstPick = idx;
-      const trial = this.trials.startTrial({ isPractice: this.gameMode === "practice", exposureMs: 0 });
+      this.flipStartedAt = performance.now();
+      const isPractice = this.gameMode === "practice";
+      this.isCurrentPracticeAttempt = isPractice;
+      const trial = this.trials.startTrial({ isPractice, exposureMs: 0 });
       this.currentTrialId = trial.trialId;
       this.emitTrialStarted(trial.trialId, { firstCard: idx });
       return;
@@ -227,9 +276,10 @@ export class PairCardsGame extends BaseGame {
     const first = this.cards[this.firstPick];
     const second = this.cards[idx];
     const isMatch = first.pairId === second.pairId;
+    const rt = Math.round(performance.now() - this.flipStartedAt);
 
-    this.trials.respond(isMatch, { firstCard: this.firstPick, secondCard: idx });
-    this.emitResponse(this.currentTrialId, { correct: isMatch, firstCard: this.firstPick, secondCard: idx });
+    this.trials.respond(isMatch, { firstCard: this.firstPick, secondCard: idx, reactionTimeMs: rt });
+    this.emitResponse(this.currentTrialId, { correct: isMatch, firstCard: this.firstPick, secondCard: idx, reactionTimeMs: rt });
 
     if (isMatch) {
       first.matched = true;
@@ -238,11 +288,13 @@ export class PairCardsGame extends BaseGame {
       second.flipped = true;
       this.matchedPairs++;
       this.score++;
+      this.matchRts.push(rt);
       this.feedbackKind = "match";
       this.firstPick = -1;
       this.emit("stimulus_shown", { matched: true });
+      this.endAttempt();
 
-      if (this.matchedPairs >= this.config.pairCount) {
+      if (this.matchedPairs >= this.config.pairCount && this.gameMode === "playing") {
         this.gameMode = "finished";
         this.pcPhase = "finished";
       }
@@ -254,8 +306,9 @@ export class PairCardsGame extends BaseGame {
     this.feedbackKind = "miss";
     this.firstPick = -1;
     this.emit("stimulus_hidden", { mismatch: true });
+    this.endAttempt();
 
-    if (this.mismatches >= this.mismatchBudget()) {
+    if (this.mismatches >= this.mismatchBudget() && this.gameMode === "playing") {
       this.gameMode = "finished";
       this.pcPhase = "finished";
       return;
@@ -266,7 +319,10 @@ export class PairCardsGame extends BaseGame {
       first.flipped = false;
       second.flipped = false;
       this.feedbackKind = null;
-      this.pcPhase = "play";
+      // Keep input blocked if the practice→scored transition already armed.
+      if (this.gameMode === "playing" || this.gameMode === "practice") {
+        this.pcPhase = "play";
+      }
     });
   }
 

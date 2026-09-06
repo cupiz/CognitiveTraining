@@ -67,6 +67,8 @@ export class TapCritterGame extends BaseGame {
   private trialNumber = 0;
   private score = 0;
   private currentTrialId = "";
+  private popStartedAt = 0;
+  private catchRts: number[] = [];
 
   // Tracking
   private practiceCount = 0;
@@ -99,6 +101,7 @@ export class TapCritterGame extends BaseGame {
     this.feedbackKind = null;
     this.trialNumber = 0;
     this.score = 0;
+    this.catchRts = [];
 
     this.tcPhase = context.practiceTrials > 0 ? "practice" : "countdown";
     this.gameMode = context.practiceTrials > 0 ? "practice" : "playing";
@@ -143,6 +146,11 @@ export class TapCritterGame extends BaseGame {
       totalTrials: this.trials.totalTrials,
       validTrials: this.trials.scoredTrialCount,
       accuracy: this.trials.accuracy,
+      medianRtMs:
+        this.catchRts.length > 0
+          ? this.catchRts.slice().sort((a, b) => a - b)[Math.floor((this.catchRts.length - 1) / 2)]
+          : undefined,
+      meanRtMs: this.catchRts.length > 0 ? this.catchRts.reduce((s, r) => s + r, 0) / this.catchRts.length : undefined,
       omissionErrors: this.trials.omissionErrors,
       commissionErrors: this.trials.commissionErrors,
       qualityFlags: this.trials.allQualityFlags,
@@ -197,19 +205,22 @@ export class TapCritterGame extends BaseGame {
 
     this.tcPhase = "pop";
 
+    this.popStartedAt = performance.now();
     this.armTimer("deadline", this.config.popMs, () => this.closePop());
   }
 
   private evaluateTap(): void {
     this.clearTimers();
 
+    const rt = Math.round(performance.now() - this.popStartedAt);
     const tappedCritter = this.currentKind === "critter";
-    this.trials.respond(tappedCritter, { tappedHole: this.lastTapped });
-    this.emitResponse(this.currentTrialId, { correct: tappedCritter, tappedHole: this.lastTapped });
+    this.trials.respond(tappedCritter, { tappedHole: this.lastTapped, reactionTimeMs: rt });
+    this.emitResponse(this.currentTrialId, { correct: tappedCritter, tappedHole: this.lastTapped, reactionTimeMs: rt });
 
     if (tappedCritter) {
       this.feedbackKind = "caught";
       this.score++;
+      this.catchRts.push(rt);
     } else {
       this.feedbackKind = "wrong";
     }
@@ -224,14 +235,17 @@ export class TapCritterGame extends BaseGame {
     this.clearTimers();
 
     const shouldHaveTapped = this.currentKind === "critter";
-    this.trials.respond(shouldHaveTapped, { tappedHole: null });
-    this.emitResponse(this.currentTrialId, { correct: shouldHaveTapped, tappedHole: null });
 
     if (shouldHaveTapped) {
+      // Missed a critter — record an omission (no trials.respond), like other games.
       this.feedbackKind = "missed";
+      this.emit("timeout", { trialId: this.currentTrialId });
     } else {
+      // Correctly let the decoy pass — a correct rejection still scores.
       this.feedbackKind = "avoided";
       this.score++;
+      this.trials.respond(true, { tappedHole: null, avoided: true });
+      this.emitResponse(this.currentTrialId, { correct: true, responded: false, avoided: true });
     }
 
     this.tcPhase = "between";
@@ -240,6 +254,7 @@ export class TapCritterGame extends BaseGame {
 
   private endPop(): void {
     this.clearTimers();
+    this.trials.endTrial();
     this.currentHole = -1;
     this.currentKind = null;
     this.lastTapped = -1;
