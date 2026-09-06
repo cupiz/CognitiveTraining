@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import {
   getDifficultyConfig,
   validateConfig,
@@ -140,17 +140,10 @@ export class CrystalTowerGame extends BaseGame {
     this.clearTimers();
     this.ctPhase = "finished";
 
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy: this.trials.accuracy,
-      omissionErrors: this.trials.omissionErrors,
-      commissionErrors: this.trials.commissionErrors,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+    );
   }
 
   getPhase() {

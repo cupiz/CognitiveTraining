@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import {
   getDifficultyConfig,
   validateConfig,
@@ -145,23 +145,10 @@ export class LighthouseKeeperGame extends BaseGame {
     this.clearTimers();
     this.lkPhase = "finished";
 
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy: this.trials.accuracy,
-      medianRtMs: this.trials.correctRts.length > 0 ? median(this.trials.correctRts) : undefined,
-      meanRtMs:
-        this.trials.correctRts.length > 0
-          ? this.trials.correctRts.reduce((a, b) => a + b, 0) / this.trials.correctRts.length
-          : undefined,
-      rtVariability: this.trials.correctRts.length > 1 ? stdDev(this.trials.correctRts) : undefined,
-      omissionErrors: this.trials.omissionErrors,
-      commissionErrors: this.trials.commissionErrors,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+    );
   }
 
   getPhase() {
@@ -326,21 +313,4 @@ export class LighthouseKeeperGame extends BaseGame {
   private clearTimers(): void {
     this.clearAllPausableTimers();
   }
-}
-
-// ── Helpers ──────────────────────────────────────────────
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
 }

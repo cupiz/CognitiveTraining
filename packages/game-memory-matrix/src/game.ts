@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng, sample } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng, sample } from "@cog/game-core";
 import { getDifficultyConfig, validateConfig, type MemoryMatrixConfig } from "./difficulty.js";
 
 export const GAME_KEY = "memory_matrix" as const;
@@ -131,21 +131,10 @@ export class MemoryMatrixGame extends BaseGame {
     this.clearTimers();
     this.mmPhase = "finished";
 
-    const rts = this.trials.correctRts;
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy: this.trials.accuracy,
-      medianRtMs: rts.length > 0 ? rts.reduce((a, b) => a + b, 0) / rts.length : undefined,
-      meanRtMs: rts.length > 0 ? rts.reduce((a, b) => a + b, 0) / rts.length : undefined,
-      rtVariability: rts.length > 1 ? this.constructor === MemoryMatrixGame ? stdDev(rts) : 0 : undefined,
-      omissionErrors: this.trials.omissionErrors,
-      commissionErrors: this.trials.commissionErrors,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+    );
   }
 
   getPhase() {
@@ -393,11 +382,4 @@ function extractCellFromInput(
     }
   }
   return null;
-}
-
-function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
 }

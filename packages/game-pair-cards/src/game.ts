@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import {
   getDifficultyConfig,
   validateConfig,
@@ -188,22 +188,11 @@ export class PairCardsGame extends BaseGame {
     this.clearTimers();
     this.pcPhase = "finished";
 
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy: this.trials.accuracy,
-      medianRtMs:
-        this.matchRts.length > 0
-          ? this.matchRts.slice().sort((a, b) => a - b)[Math.floor((this.matchRts.length - 1) / 2)]
-          : undefined,
-      meanRtMs: this.matchRts.length > 0 ? this.matchRts.reduce((s, r) => s + r, 0) / this.matchRts.length : undefined,
-      omissionErrors: this.trials.omissionErrors,
-      commissionErrors: this.trials.commissionErrors,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+      { rts: this.matchRts },
+    );
   }
 
   getPhase() {

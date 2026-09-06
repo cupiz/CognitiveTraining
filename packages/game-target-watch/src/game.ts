@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import { getDifficultyConfig, validateConfig, generateSequence, type TargetWatchConfig } from "./difficulty.js";
 
 export const GAME_KEY = "target_watch" as const;
@@ -167,27 +167,21 @@ export class TargetWatchGame extends BaseGame {
     this.clearTimers();
     this.twPhase = "finished";
 
-    const medianRt = this.hitRts.length > 0 ? median(this.hitRts) : undefined;
-    const meanRt = this.hitRts.length > 0 ? this.hitRts.reduce((a, b) => a + b, 0) / this.hitRts.length : undefined;
-    const rtVar = this.hitRts.length > 1 ? stdDev(this.hitRts) : undefined;
-
+    // Per-stimulus outcomes live in engine tallies (the tracker is not fed
+    // respond()), so override the tracker-derived metrics; trial accounting
+    // still comes from the tracker.
     const totalScored = this.hits + this.misses + this.falseAlarms;
-    const accuracy = totalScored > 0 ? (this.hits + (totalScored - this.hits - this.falseAlarms)) / totalScored : 0;
 
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy,
-      medianRtMs: medianRt,
-      meanRtMs: meanRt,
-      rtVariability: rtVar,
-      omissionErrors: this.misses,
-      commissionErrors: this.falseAlarms,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+      {
+        rts: this.hitRts,
+        accuracy: totalScored > 0 ? (this.hits + this.misses) / totalScored : 0,
+        omissionErrors: this.misses,
+        commissionErrors: this.falseAlarms,
+      },
+    );
   }
 
   getPhase() {
@@ -433,21 +427,4 @@ export class TargetWatchGame extends BaseGame {
   }
 
 
-}
-
-// ── Helpers ──────────────────────────────────────────────
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
 }

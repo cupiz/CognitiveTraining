@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import {
   getDifficultyConfig,
   validateConfig,
@@ -139,22 +139,11 @@ export class TapCritterGame extends BaseGame {
     this.clearTimers();
     this.tcPhase = "finished";
 
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy: this.trials.accuracy,
-      medianRtMs:
-        this.catchRts.length > 0
-          ? this.catchRts.slice().sort((a, b) => a - b)[Math.floor((this.catchRts.length - 1) / 2)]
-          : undefined,
-      meanRtMs: this.catchRts.length > 0 ? this.catchRts.reduce((s, r) => s + r, 0) / this.catchRts.length : undefined,
-      omissionErrors: this.trials.omissionErrors,
-      commissionErrors: this.trials.commissionErrors,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+      { rts: this.catchRts },
+    );
   }
 
   getPhase() {

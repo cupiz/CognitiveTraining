@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import {
   getDifficultyConfig,
   validateConfig,
@@ -201,29 +201,11 @@ export class RuleSwitchGame extends BaseGame {
     this.clearTimers();
     this.rsPhase = "finished";
 
-    const allRts = [...this.switchRts, ...this.stayRts];
-    const medianRt = allRts.length > 0 ? median(allRts) : undefined;
-    const meanRt = allRts.length > 0 ? allRts.reduce((a, b) => a + b, 0) / allRts.length : undefined;
-    const rtVar = allRts.length > 1 ? stdDev(allRts) : undefined;
-
-    const totalCorrect = this.correctSwitches + this.correctStays;
-    const totalTrials = this.switchTrials + this.stayTrials;
-    const accuracy = totalTrials > 0 ? totalCorrect / totalTrials : 0;
-
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy,
-      medianRtMs: medianRt,
-      meanRtMs: meanRt,
-      rtVariability: rtVar,
-      omissionErrors: 0,
-      commissionErrors: this.incorrectSwitches + this.incorrectStays,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+      { rts: [...this.switchRts, ...this.stayRts] },
+    );
   }
 
   getPhase() {
@@ -360,6 +342,12 @@ export class RuleSwitchGame extends BaseGame {
     this.responseCorrect = isCorrect;
     this.feedbackMessage = isCorrect ? "✓ Correct!" : "✗ Wrong!";
 
+    this.trials.respond(isCorrect, {
+      selectedOption: optionIndex,
+      correctOption: this.matchIndex,
+      reactionTimeMs: rt,
+    });
+
     const trial = this.trials.completedTrials[this.trials.completedTrials.length - 1];
     if (trial) {
       this.emitResponse(trial.trialId, {
@@ -397,6 +385,8 @@ export class RuleSwitchGame extends BaseGame {
     }
 
     this.responseCorrect = false;
+
+    this.trials.respond(false, { timeout: true });
 
     const trial = this.trials.completedTrials[this.trials.completedTrials.length - 1];
     if (trial) {
@@ -455,21 +445,4 @@ export class RuleSwitchGame extends BaseGame {
     this.feedbackTimer = null;
     this.intermissionTimer = null;
   }
-}
-
-// ── Helpers ──────────────────────────────────────────────
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
 }

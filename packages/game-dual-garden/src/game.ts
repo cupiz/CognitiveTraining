@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import {
   getDifficultyConfig,
   validateConfig,
@@ -144,17 +144,10 @@ export class DualGardenGame extends BaseGame {
     this.clearTimers();
     this.dgPhase = "finished";
 
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy: this.trials.accuracy,
-      omissionErrors: this.trials.omissionErrors,
-      commissionErrors: this.trials.commissionErrors,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+    );
   }
 
   getPhase() {
@@ -255,8 +248,9 @@ export class DualGardenGame extends BaseGame {
     const fruitMatches = this.currentFruit === this.targetFruit;
     const shouldMark = this.config.requireBoth ? animalMatches && fruitMatches : fruitMatches;
 
-    this.trials.respond(shouldMark, { rangMarker: false });
-    this.emitResponse(this.currentTrialId, { correct: shouldMark, rangMarker: false });
+    // No marker tap: correct rejection when the round wasn't a target.
+    this.trials.respond(!shouldMark, { rangMarker: false });
+    this.emitResponse(this.currentTrialId, { correct: !shouldMark, rangMarker: false });
 
     if (shouldMark) {
       this.feedbackKind = "miss";

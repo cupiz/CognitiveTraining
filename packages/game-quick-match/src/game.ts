@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import { getDifficultyConfig, validateConfig, generateTrial, type QuickMatchConfig } from "./difficulty.js";
 
 export const GAME_KEY = "quick_match" as const;
@@ -163,27 +163,16 @@ export class QuickMatchGame extends BaseGame {
     this.clearTimers();
     this.qmPhase = "finished";
 
-    const medianRt = this.correctRts.length > 0 ? median(this.correctRts) : undefined;
-    const meanRt = this.correctRts.length > 0 ? this.correctRts.reduce((a, b) => a + b, 0) / this.correctRts.length : undefined;
-    const rtVar = this.correctRts.length > 1 ? stdDev(this.correctRts) : undefined;
-
-    const totalScored = this.correctCount + this.incorrectCount + this.timeoutCount;
-    const accuracy = totalScored > 0 ? this.correctCount / totalScored : 0;
-
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy,
-      medianRtMs: medianRt,
-      meanRtMs: meanRt,
-      rtVariability: rtVar,
-      omissionErrors: this.timeoutCount,
-      commissionErrors: this.incorrectCount,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+      {
+        rts: this.correctRts,
+        accuracy: this.correctCount / Math.max(1, this.correctCount + this.incorrectCount + this.timeoutCount),
+        omissionErrors: this.timeoutCount,
+        commissionErrors: this.incorrectCount,
+      },
+    );
   }
 
   getPhase() {
@@ -376,21 +365,4 @@ export class QuickMatchGame extends BaseGame {
     this.feedbackTimer = null;
     this.intermissionTimer = null;
   }
-}
-
-// ── Helpers ──────────────────────────────────────────────
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
 }

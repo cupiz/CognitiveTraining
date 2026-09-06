@@ -32,5 +32,8 @@ export { GameRunner } from "./runner.js";
 // ── Trial Tracking ────────────────────────────────────────
 export { TrialTracker, type TrialRecord } from "./trial-tracker.js";
 
+// ── Summary helpers ───────────────────────────────────────
+export { median, mean, stdDev, buildSummary, type BuildSummaryOptions } from "./summary.js";
+
 // ── Base Game ─────────────────────────────────────────────
 export { BaseGame } from "./base-game.js";

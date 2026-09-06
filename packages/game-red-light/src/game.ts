@@ -1,6 +1,6 @@
 import type { InputEvent } from "@cog/schemas";
 import type { GameContext, GameSummary } from "@cog/game-core";
-import { BaseGame, createRng } from "@cog/game-core";
+import { BaseGame, buildSummary, createRng } from "@cog/game-core";
 import {
   getDifficultyConfig,
   validateConfig,
@@ -191,27 +191,14 @@ export class RedLightGame extends BaseGame {
     this.clearTimers();
     this.rlPhase = "finished";
 
-    const medianRt = this.goRts.length > 0 ? median(this.goRts) : undefined;
-    const meanRt =
-      this.goRts.length > 0 ? this.goRts.reduce((a, b) => a + b, 0) / this.goRts.length : undefined;
-    const rtVar = this.goRts.length > 1 ? stdDev(this.goRts) : undefined;
-
-    const goAccuracy = this.goTrials > 0 ? this.correctGos / this.goTrials : 0;
-
-    return {
-      gameKey: this.key,
-      gameVersion: this.version,
-      config: this.config as unknown as Record<string, unknown>,
-      totalTrials: this.trials.totalTrials,
-      validTrials: this.trials.scoredTrialCount,
-      accuracy: goAccuracy,
-      medianRtMs: medianRt,
-      meanRtMs: meanRt,
-      rtVariability: rtVar,
-      omissionErrors: this.trials.omissionErrors,
-      commissionErrors: this.trials.commissionErrors,
-      qualityFlags: this.trials.allQualityFlags,
-    };
+    return buildSummary(
+      { key: this.key, version: this.version, config: this.config as unknown as Record<string, unknown> },
+      this.trials,
+      {
+        rts: this.goRts,
+        accuracy: this.goTrials > 0 ? this.correctGos / this.goTrials : 0,
+      },
+    );
   }
 
   getPhase() {
@@ -463,21 +450,4 @@ export class RedLightGame extends BaseGame {
   private clearTimers(): void {
     this.clearAllPausableTimers();
   }
-}
-
-// ── Helpers ──────────────────────────────────────────────
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
-function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
 }
