@@ -147,6 +147,24 @@ const DOMAIN_MAPPINGS: DomainMapping[] = [
       visual_spatial: 0.4,
     },
   },
+  {
+    gameKey: "tap_critter",
+    primaryDomain: "processing_speed",
+    secondaryDomains: ["inhibitory_control"],
+    weights: {
+      processing_speed: 0.7,
+      inhibitory_control: 0.3,
+    },
+  },
+  {
+    gameKey: "pair_cards",
+    primaryDomain: "visual_spatial",
+    secondaryDomains: ["working_memory"],
+    weights: {
+      visual_spatial: 0.6,
+      working_memory: 0.4,
+    },
+  },
 ];
 
 // ── Lookup Maps ──────────────────────────────────────────

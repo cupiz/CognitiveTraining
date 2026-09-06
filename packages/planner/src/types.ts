@@ -22,7 +22,9 @@ export type GameKey =
   | "train_n_back"
   | "dual_garden"
   | "crystal_tower"
-  | "wide_view";
+  | "wide_view"
+  | "tap_critter"
+  | "pair_cards";
 
 // ── Cognitive Domain ─────────────────────────────────────
 

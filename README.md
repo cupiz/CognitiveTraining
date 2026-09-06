@@ -39,7 +39,7 @@ that parents can actually understand.
 
 | | |
 |---|---|
-| 🎮 Mini-games | **15** across **6** cognitive domains |
+| 🎮 Mini-games | **17** across **6** cognitive domains |
 | 📦 Packages | **15** in a pnpm monorepo |
 | ✅ Unit tests | **602** (Vitest) |
 | 🌐 E2E tests | **60** (Playwright) |
@@ -65,6 +65,8 @@ that parents can actually understand.
 | 🌷 **Kebun Dua Arus** | Divided Attention | Two streams at once — mark only when both hit their targets. |
 | 🗼 **Menara Kristal (Crystal Tower)** | Planning | Tower-of-Hanoi: move all crystals before moves or time run out. |
 | 🔭 **Binocular (Wide View)** | Visual Scanning | Catch where the bird flashed while watching the centre. |
+| 🐹 **Tangkap Tikus (Tap Critter)** | Reaction Time | Garden critters pop up — tap them fast, dodge the cactus! |
+| 🃏 **Kartu Kembar (Pair Cards)** | Recognition | Flip two cards, find the matching pairs before guesses run out. |
 
 Every game ships with 10 difficulty levels (D1–D10), a no-stakes practice phase,
 kid-readable in-arena instructions, a per-trial time bar, and pause-safe timers.

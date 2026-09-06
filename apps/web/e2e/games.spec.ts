@@ -23,6 +23,8 @@ const GAMES = [
   { key: "dual_garden", marker: "Misi:" },
   { key: "crystal_tower", marker: "antar semua kristal ke menara kanan" },
   { key: "wide_view", marker: "posisi burung yang berkedip" },
+  { key: "tap_critter", marker: "Ketuk makhluk" },
+  { key: "pair_cards", marker: "Balik dua kartu" },
 ];
 
 test.describe("Game availability", () => {

@@ -37,6 +37,8 @@ const VISIBILITY_KEYS = [
   "dual_garden",
   "crystal_tower",
   "wide_view",
+  "tap_critter",
+  "pair_cards",
 ];
 const VISIBILITY_SQL = VISIBILITY_KEYS.map(
   (key) =>

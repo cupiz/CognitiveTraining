@@ -13,3 +13,5 @@ export { TrainNBack } from "./TrainNBack";
 export { DualGarden } from "./DualGarden";
 export { CrystalTower } from "./CrystalTower";
 export { WideView } from "./WideView";
+export { TapCritter } from "./TapCritter";
+export { PairCards } from "./PairCards";

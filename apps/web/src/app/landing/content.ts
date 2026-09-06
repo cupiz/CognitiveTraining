@@ -146,6 +146,10 @@ const CONTENT: Record<"en" | "id", LandingContent> = {
         "Move the crystals to the target tower, planning each step before you tap.",
       wide_view:
         "Keep an eye on the centre symbol — and catch where the bird flashes around the screen.",
+      tap_critter:
+        "Critters pop out of garden holes — tap them fast, but never touch the cactus!",
+      pair_cards:
+        "Flip two cards at a time and find the matching pairs before your guesses run out.",
     },
     faqEyebrow: "Questions?",
     faqTitle: "Parents usually ask",
@@ -333,6 +337,10 @@ const CONTENT: Record<"en" | "id", LandingContent> = {
         "Antar kristal ke menara tujuan — rencanakan langkahmu sebelum menekan.",
       wide_view:
         "Awasi simbol di tengah — dan tangkap posisi burung yang berkedip di tepi layar.",
+      tap_critter:
+        "Makhluk lucu muncul dari lubang — ketuk cepat sebelum menghilang, tapi awas kaktus!",
+      pair_cards:
+        "Balik dua kartu dan cari pasangan kembar — ingat posisinya sebelum menutup!",
       sushi_express:
         "Ketuk piring sushi yang sesuai pesanan saat lewat di ban berjalan.",
       crystal_palace:

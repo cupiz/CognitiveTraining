@@ -179,6 +179,8 @@ const GAME_VERSIONS: Record<GameKey, string> = {
   dual_garden: "0.1.0",
   crystal_tower: "0.1.0",
   wide_view: "0.1.0",
+  tap_critter: "0.1.0",
+  pair_cards: "0.1.0",
 };
 
 /**

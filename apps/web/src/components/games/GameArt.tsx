@@ -325,6 +325,47 @@ function BinocularArt({ c }: { c: string }) {
   );
 }
 
+
+function CritterArt({ c }: { c: string }) {
+  return (
+    <svg viewBox="0 0 96 96" className="h-full w-full" aria-hidden="true">
+      {/* three garden holes */}
+      <ellipse cx="26" cy="66" rx="16" ry="9" fill={c} opacity="0.4" />
+      <ellipse cx="62" cy="66" rx="16" ry="9" fill={c} opacity="0.4" />
+      <ellipse cx="88" cy="66" rx="14" ry="8" fill={c} opacity="0.4" />
+      {/* critter popping from the middle hole */}
+      <circle cx="62" cy="44" r="14" fill={c} />
+      <circle cx="57" cy="41" r="2.5" fill="#fff" />
+      <circle cx="67" cy="41" r="2.5" fill="#fff" />
+      {/* ears */}
+      <rect x="52" y="26" width="5" height="12" rx="2.5" fill={c} />
+      <rect x="67" y="26" width="5" height="12" rx="2.5" fill={c} />
+      {/* cactus in the right hole */}
+      <rect x="84" y="46" width="6" height="16" rx="3" fill={c} opacity="0.5" />
+      <path d="M50 60l4-6 4 6" stroke="#e8a738" strokeWidth="3" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
+function CardsArt({ c }: { c: string }) {
+  return (
+    <svg viewBox="0 0 96 96" className="h-full w-full" aria-hidden="true">
+      {/* card back (tilted) */}
+      <g transform="rotate(-12 40 52)">
+        <rect x="22" y="26" width="32" height="44" rx="5" fill={c} opacity="0.45" />
+        <rect x="26" y="30" width="24" height="36" rx="3" fill="none" stroke={c} strokeWidth="2.5" opacity="0.6" />
+      </g>
+      {/* card face with a star pair */}
+      <g transform="rotate(8 62 48)">
+        <rect x="46" y="24" width="32" height="44" rx="5" fill={c} />
+        <path d="M62 36l3.5 8 8.5 1-6 6 1.5 8-7.5-4-7.5 4 1.5-8-6-6 8.5-1Z" fill="#fff" opacity="0.9" />
+      </g>
+      {/* sparkles */}
+      <path d="M18 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill={c} opacity="0.6" />
+    </svg>
+  );
+}
+
 export function GameArt({ gameKey, className = "" }: { gameKey: string; className?: string }) {
   const meta = gameMeta(gameKey);
   return (
@@ -340,6 +381,8 @@ export function GameArt({ gameKey, className = "" }: { gameKey: string; classNam
       {gameKey === "lighthouse_keeper" && <LighthouseArt c={meta.color} />}
       {gameKey === "sushi_express" && <SushiArt c={meta.color} />}
       {gameKey === "crystal_palace" && <CrystalArt c={meta.color} />}
+      {gameKey === "tap_critter" && <CritterArt c={meta.color} />}
+      {gameKey === "pair_cards" && <CardsArt c={meta.color} />}
       {gameKey === "train_n_back" && <TrainArt c={meta.color} />}
       {gameKey === "dual_garden" && <GardenArt c={meta.color} />}
       {gameKey === "crystal_tower" && <TowerArt c={meta.color} />}

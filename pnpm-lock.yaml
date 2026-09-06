@@ -68,6 +68,9 @@ importers:
       '@cog/game-memory-matrix':
         specifier: workspace:*
         version: link:../../packages/game-memory-matrix
+      '@cog/game-pair-cards':
+        specifier: workspace:*
+        version: link:../../packages/game-pair-cards
       '@cog/game-quick-match':
         specifier: workspace:*
         version: link:../../packages/game-quick-match
@@ -86,6 +89,9 @@ importers:
       '@cog/game-sushi-express':
         specifier: workspace:*
         version: link:../../packages/game-sushi-express
+      '@cog/game-tap-critter':
+        specifier: workspace:*
+        version: link:../../packages/game-tap-critter
       '@cog/game-target-watch':
         specifier: workspace:*
         version: link:../../packages/game-target-watch
@@ -344,6 +350,22 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
 
+  packages/game-pair-cards:
+    dependencies:
+      '@cog/game-core':
+        specifier: workspace:*
+        version: link:../game-core
+      '@cog/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
+
   packages/game-quick-match:
     dependencies:
       '@cog/game-core':
@@ -425,6 +447,22 @@ importers:
         version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
 
   packages/game-sushi-express:
+    dependencies:
+      '@cog/game-core':
+        specifier: workspace:*
+        version: link:../game-core
+      '@cog/schemas':
+        specifier: workspace:*
+        version: link:../schemas
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@30.0.1)(lightningcss@1.32.0)(tsx@4.23.13)
+
+  packages/game-tap-critter:
     dependencies:
       '@cog/game-core':
         specifier: workspace:*

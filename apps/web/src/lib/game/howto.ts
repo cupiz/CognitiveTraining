@@ -109,6 +109,20 @@ export const GAME_HOWTO: Record<string, { steps: string[] }> = {
       "Burung 🐦 akan berkedip sebentar di sekeliling layar — ingat posisinya!",
       "Setelah itu, ketuk posisi burung yang tadi muncul.",
     ],
+  },
+  tap_critter: {
+    steps: [
+      "Makhluk lucu muncul tiba-tiba dari lubang!",
+      "Ketuk mereka secepat mungkin sebelum menghilang.",
+      "Hati-hati: kaktus berduri 🌵 jangan diketuk!",
+    ],
+  },
+  pair_cards: {
+    steps: [
+      "Semua kartu tertutup — balik dua kartu untuk mencari pasangan.",
+      "Kalau gambarnya kembar, kartunya tetap terbuka.",
+      "Temukan semua pasangan sebelum tebakan habis!",
+    ],
   }
 };
 

@@ -208,6 +208,32 @@ export const GAMES: GameMeta[] = [
       deep: "#1c5490",
       description: "Sambil mengawasi simbol di tengah, tangkap posisi burung yang berkedip di tepi layar.",
       defaultDifficulty: 4,
+    },
+    {
+      key: "tap_critter",
+      name: "Tangkap Tikus",
+      domain: "Waktu Reaksi",
+      domainKey: "processing_speed",
+      family: "flagship",
+      color: "#d97706",
+      tint: "#fdf0dd",
+      deep: "#92400e",
+      description: "Makhluk lucu muncul dari lubang — ketuk cepat! Tapi jangan sentuh kaktus berduri!",
+      defaultDifficulty: 3,
+      roundTrials: 20,
+    },
+    {
+      key: "pair_cards",
+      name: "Kartu Kembar",
+      domain: "Pengenalan Visual",
+      domainKey: "visual_spatial",
+      family: "flagship",
+      color: "#0ea5e9",
+      tint: "#e0f2fe",
+      deep: "#0369a1",
+      description: "Balik dua kartu dan cari pasangan kembar — ingat posisinya sebelum menutup!",
+      defaultDifficulty: 3,
+      roundTrials: 14,
     }
 ];
 

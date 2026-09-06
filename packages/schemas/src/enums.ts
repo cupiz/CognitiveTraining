@@ -70,6 +70,8 @@ export const GameKey = z.enum([
   "dual_garden",
   "crystal_tower",
   "wide_view",
+  "tap_critter",
+  "pair_cards",
 ]);
 export type GameKey = z.infer<typeof GameKey>;
 

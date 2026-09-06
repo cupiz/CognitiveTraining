@@ -81,6 +81,8 @@ enum GameKey {
   dual_garden
   crystal_tower
   wide_view
+  tap_critter
+  pair_cards
 }
 
 enum GameRunStatus {
