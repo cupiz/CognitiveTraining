@@ -66,7 +66,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
           : "";
 
   return (
-    <div className="flex w-full flex-col items-center gap-3" style={{ maxWidth: "min(36rem, 100%)" }}>
+    <div className="flex w-full flex-col items-center gap-3" style={{ maxWidth: "min(44rem, 100%)" }}>
       <TrialHeader isPractice={isPractice} trial={trialNumber} total={totalTrials} score={score} accent={accent} />
 
       {/* ── Central mini-task: its own banner, can never cover the sky ── */}
@@ -84,10 +84,10 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
         </div>
         <div>
           <p className="text-[13px] font-extrabold" style={{ color: "var(--game-ink)" }}>
-            {centralIsTarget ? "⭐ Simbol ini = SEGERA KETUK layar!" : "Simbol biasa — jangan diketuk"}
+            {centralIsTarget ? "⭐ Simbol target" : "Simbol lainnya"}
           </p>
           <p className="text-[12px] font-semibold" style={{ color: "var(--game-ink-mute)" }}>
-            Sambil mengintip burung 🐦 yang berkedip di teleskop bawah
+            Simbol di lensa cuma hiasan — fokusmu cari burung 🐦 yang berkedip di bawah!
           </p>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
         <span className="pointer-events-none absolute right-4 top-1/2 size-2 -translate-y-1/2 rounded-full bg-[#c9a44d]" />
 
         <div
-          className="relative mx-auto aspect-square w-full max-w-[28rem] overflow-hidden rounded-full"
+          className="relative mx-auto aspect-square w-full max-w-[32rem] overflow-hidden rounded-full"
           style={{
             background: "radial-gradient(circle at 50% 45%, #2a3c78 0%, #17224d 55%, #0a0f26 100%)",
             boxShadow:
@@ -162,7 +162,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
                 onClick={() => onCellTap(i)}
                 disabled={!probeInteractive}
                 aria-label={`Posisi ${i + 1}`}
-                className={`absolute z-10 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-2xl transition-all sm:size-20 sm:text-3xl ${
+                className={`absolute z-10 flex size-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-3xl transition-all sm:size-24 sm:text-4xl ${
                   probeInteractive ? "cursor-pointer" : ""
                 }`}
                 style={{
@@ -238,7 +238,7 @@ export function WideView({ renderState, onCellTap }: WideViewProps) {
         <p className="text-[12px] font-semibold" style={{ color: "var(--game-ink-mute)" }}>
           {phase === "probe"
             ? "Sekarang tunjuk: di mana burung tadi berkedip?"
-            : "Simbol tengah ⭐ = segera ketuk! Dan mata tetap mengawasi burung di teleskop."}
+            : "Simbol tengah cuma hiasan — fokusmu adalah burung 🐦 yang berkedip!"}
         </p>
       </div>
 

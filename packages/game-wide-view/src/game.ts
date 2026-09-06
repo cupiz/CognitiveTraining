@@ -72,7 +72,6 @@ export class WideViewGame extends BaseGame {
   private centralSymbol: string | null = null;
   private centralIsTarget = false;
   private centralHit: boolean | null = null;
-  private centralResponded = false;
   private flashPosition = -1;
   private flashActive = false;
   private flashSlot = -1;
@@ -111,7 +110,6 @@ export class WideViewGame extends BaseGame {
     this.centralSymbol = null;
     this.centralIsTarget = false;
     this.centralHit = null;
-    this.centralResponded = false;
     this.flashPosition = -1;
     this.flashActive = false;
     this.probedSlot = -1;
@@ -130,18 +128,9 @@ export class WideViewGame extends BaseGame {
     if (input.type !== "pointer_down" && input.type !== "touch") return;
     const payload = (input as Record<string, unknown>).cellIndex;
 
-    if (this.wvPhase === "fixation" && this.config.centralTask) {
-      if (this.centralResponded) return;
-      this.centralResponded = true;
-      this.centralHit = this.centralIsTarget;
-      if (this.centralIsTarget) {
-        // Correct go — acknowledged silently; no state change needed.
-        this.emit("custom", { kind: "central_go_correct", trialId: this.currentTrialId });
-      } else {
-        this.emit("custom", { kind: "central_go_wrong", trialId: this.currentTrialId });
-      }
-      return;
-    }
+    // The central symbol stream is a pure visual distractor (its classic UFOV
+    // role) — only the peripheral probe is scored, so a correct answer can
+    // never be punished by the competing stream.
 
     if (this.wvPhase === "probe") {
       const slot = typeof payload === "number" ? Math.floor(payload) : -1;
@@ -215,7 +204,6 @@ export class WideViewGame extends BaseGame {
     this.probedSlot = -1;
     this.correctSlot = -1;
     this.centralHit = null;
-    this.centralResponded = false;
     this.trialNumber = this.practiceCount + this.scoredCount + 1;
 
     this.flashSlot = Math.floor(this.rng() * PROBE_SLOTS);
@@ -284,14 +272,11 @@ export class WideViewGame extends BaseGame {
   private finishTrial(): void {
     this.clearTimers();
 
-    const probeCorrect = this.probedSlot === this.correctSlot;
-    const centralOk = !this.config.centralTask || this.centralHit === true || !this.centralIsTarget;
-    const correct = probeCorrect && centralOk;
+    const correct = this.probedSlot === this.correctSlot;
 
     this.trials.respond(correct, {
       probedSlot: this.probedSlot,
       correctSlot: this.correctSlot,
-      centralHit: this.centralHit,
     });
     this.emitResponse(this.currentTrialId, { correct, probedSlot: this.probedSlot, correctSlot: this.correctSlot });
 

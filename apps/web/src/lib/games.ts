@@ -20,6 +20,8 @@ export interface GameMeta {
   deep: string;
   description: string;
   defaultDifficulty: number;
+  /** Trials per round for this game (defaults to 20 when absent) */
+  roundTrials?: number;
 }
 
 export const GAMES: GameMeta[] = [
@@ -157,6 +159,7 @@ export const GAMES: GameMeta[] = [
   },
     {
       key: "train_n_back",
+      roundTrials: 20,
       name: "Kereta N-Back",
       domain: "Memori Kerja",
       domainKey: "working_memory",
@@ -169,6 +172,7 @@ export const GAMES: GameMeta[] = [
     },
     {
       key: "dual_garden",
+      roundTrials: 16,
       name: "Kebun Dua Arus",
       domain: "Atensi Terbagi",
       domainKey: "sustained_attention",
@@ -181,6 +185,7 @@ export const GAMES: GameMeta[] = [
     },
     {
       key: "crystal_tower",
+      roundTrials: 3,
       name: "Menara Kristal",
       domain: "Fleksibilitas Kognitif",
       domainKey: "cognitive_flexibility",
@@ -193,6 +198,7 @@ export const GAMES: GameMeta[] = [
     },
     {
       key: "wide_view",
+      roundTrials: 12,
       name: "Binocular",
       domain: "Atensi Terbagi",
       domainKey: "sustained_attention",

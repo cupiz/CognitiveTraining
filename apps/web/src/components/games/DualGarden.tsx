@@ -44,7 +44,7 @@ export function DualGarden({ renderState, onCellTap }: DualGardenProps) {
       : "var(--game-wrong)";
 
   return (
-    <div className="flex w-full flex-col items-center gap-3" style={{ maxWidth: "min(34rem, 100%)" }}>
+    <div className="flex w-full flex-col items-center gap-3" style={{ maxWidth: "min(42rem, 100%)" }}>
       <TrialHeader isPractice={isPractice} trial={trialNumber} total={totalTrials} score={score} accent={accent} />
 
       {/* Mission banner: polaroid targets per stream */}

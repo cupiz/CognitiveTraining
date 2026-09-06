@@ -36,6 +36,7 @@ import type { DGRenderState } from "@cog/game-dual-garden";
 import type { CTRenderState } from "@cog/game-crystal-tower";
 import type { WVRenderState } from "@cog/game-wide-view";
 import { Icon } from "@/components/ui/icons";
+import { gameMeta } from "@/lib/games";
 import {
   createGameRun,
   startGameRun,
@@ -193,6 +194,7 @@ export default function PlayPage({ params }: PlayPageProps) {
     [gameKey],
   );
   const Renderer = useMemo(() => GAME_RENDERERS[gameKey] ?? null, [gameKey]);
+  const meta = useMemo(() => gameMeta(gameKey), [gameKey]);
 
   // ── Boot: resolve session → create real server game run ──
   useEffect(() => {
@@ -338,7 +340,7 @@ export default function PlayPage({ params }: PlayPageProps) {
           seed: Date.now(),
           isPractice: false,
           practiceTrials: 3,
-          maxTrials: 20,
+          maxTrials: meta.roundTrials ?? 20,
         }}
         ids={{ sessionId: boot.ids.sessionId, gameRunId: boot.ids.gameRunId }}
         onFinish={() => router.push(backTarget)}
